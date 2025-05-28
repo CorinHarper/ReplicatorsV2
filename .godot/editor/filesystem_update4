@@ -9,3 +9,4 @@ res://Maps/DevMap/greybox_bridge.tscn
 res://Maps/DevMap/greyboxing.tscn
 res://Enemy/SpiderBot/spider_bot/spider_bot.tscn
 res://TestLevel.tscn
+res://Enemy/SpiderBot/spider_bot/step_ray.gd

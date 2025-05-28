@@ -30,12 +30,13 @@ var collision_states = {
 }
 
 # Ground detection ray
+signal grounded_state_changed(is_grounded: bool)
 @onready var ground_ray = $GroundRay
 var ground_ray_colliding: bool = false
 var vertical_velocity: float = 0.0
 var is_grounded: bool = true
 # Add this export variable with your other exports:
-@export var fall_alignment_speed: float = 2.0  # How quickly to align when falling
+@export var fall_alignment_speed: float = 5.0  # How quickly to align when falling
 
 
 var mouse_delta_x: float = 0.0
@@ -62,6 +63,8 @@ func _ready():
 	if capture_mouse:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
+	grounded_state_changed.connect(_on_grounded_state_changed)
+	
 func _input(event):
 	if event is InputEventMouseMotion:
 		mouse_delta_x = event.relative.x
@@ -158,18 +161,24 @@ func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basi
 	
 # Replace your _update_grounded_state function:
 func _update_grounded_state():
+	var previous_grounded = is_grounded
+
 	if is_grounded:
 		# When grounded, lose ground contact if NO legs are touching
 		is_grounded = collision_states.values().any(func(colliding): return colliding)
 		# disable leg rays the moment none are colliding 
-		if is_grounded == false:
-			_disable_leg_rays()
+		#if is_grounded == false:
+			#_disable_leg_rays()
 	else:
 		# When airborne, only regain ground contact via ground ray
 		if ground_ray and ground_ray.is_colliding():
 			# enable leg rays only once the ground ray is colliding
 			is_grounded = true
-			_enable_leg_rays()
+			#_enable_leg_rays()
+			
+	# Emit signal if state changed
+	if previous_grounded != is_grounded:
+		grounded_state_changed.emit(is_grounded)
 
 func _disable_leg_rays(): 
 	fl_ray.enabled = false
@@ -242,3 +251,28 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	result.z *= scale.z 
 	
 	return result
+
+
+
+
+
+func _on_grounded_state_changed(grounded: bool):
+	# Notify all IK targets about grounding state
+	if fl_leg:
+		fl_leg.set_grounded(grounded)
+	if fr_leg:
+		fr_leg.set_grounded(grounded)
+	if bl_leg:
+		bl_leg.set_grounded(grounded)
+	if br_leg:
+		br_leg.set_grounded(grounded)
+	
+	# Also notify the rays
+	if fl_ray and fl_ray.has_method("set_grounded"):
+		fl_ray.set_grounded(grounded)
+	if fr_ray and fr_ray.has_method("set_grounded"):
+		fr_ray.set_grounded(grounded)
+	if bl_ray and bl_ray.has_method("set_grounded"):
+		bl_ray.set_grounded(grounded)
+	if br_ray and br_ray.has_method("set_grounded"):
+		br_ray.set_grounded(grounded)

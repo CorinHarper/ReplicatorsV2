@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://kuetdndqvbpn"]
+
+[ext_resource type="Material" uid="uid://jgfsij8wxsfn" path="res://Materials/Dev/1x1m.tres" id="1_7sd3j"]
+[ext_resource type="PackedScene" uid="uid://chiejnjq0p3lg" path="res://CSG/ramp_45d_1x1m.tscn" id="1_u01it"]
+
+[node name="Node3D" type="CSGCombiner3D"]
+material_override = ExtResource("1_7sd3j")
+use_collision = true
+
+[node name="Ramp_45d_1x1m" parent="." instance=ExtResource("1_u01it")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
+
+[node name="Ramp_45d_1x1m2" parent="." instance=ExtResource("1_u01it")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.5, 0, 0)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)

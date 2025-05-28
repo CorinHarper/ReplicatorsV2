@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://i5i526f5yl6m"]
+
+[ext_resource type="PackedScene" uid="uid://cabgrr2bvykhs" path="res://Enemy/SpiderBot/spider_bot/spider_bot.tscn" id="2_2xot7"]
+[ext_resource type="PackedScene" uid="uid://wdt75bmcdfcp" path="res://DevMap.tscn" id="3_2xot7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vvvv7"]
+
+[sub_resource type="Sky" id="Sky_hij1a"]
+sky_material = SubResource("ProceduralSkyMaterial_vvvv7")
+
+[sub_resource type="Environment" id="Environment_y1jsw"]
+background_mode = 2
+background_energy_multiplier = 2.93
+sky = SubResource("Sky_hij1a")
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+sdfgi_enabled = true
+sdfgi_use_occlusion = true
+sdfgi_cascades = 8
+sdfgi_y_scale = 0
+
+[node name="Node3D" type="Node3D"]
+
+[node name="DevMap" parent="." instance=ExtResource("3_2xot7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_y1jsw")
+
+[node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 0.290371, 0.26464)
+
+[node name="Camera3D" type="Camera3D" parent="SpiderBot"]
+transform = Transform3D(1, 0, 0, 0, 0.676645, 0.736309, 0, -0.736309, 0.676645, -0.0826885, 0.886695, 0.852844)

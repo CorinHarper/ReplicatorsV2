@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://gvrkke8kaewi"]
+
+[ext_resource type="PackedScene" uid="uid://3ou1xuad0xqf" path="res://Maps/DevMap/greyboxing.blend" id="1_22g4t"]
+[ext_resource type="Material" uid="uid://dwcburwy0beuy" path="res://Maps/DevMap/greyboxingMaterial.tres" id="2_3duyb"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_22g4t"]
+margin = 1.0
+data = PackedVector3Array(20, 0, -20, 0, 0, 0, 0, 0, -20, 20, 0, -20, 20, 0, 0, 0, 0, 0, 20, 2, -20, 20, 0, 0, 20, 0, -20, 20, 2, -20, 20, 2, 0, 20, 0, 0, 0, 2, -20, 20, 0, -20, 0, 0, -20, 0, 2, -20, 20, 2, -20, 20, 0, -20, 0, 2, 0, 0, 0, -20, 0, 0, 0, 0, 2, 0, 0, 2, -20, 0, 0, -20, 0, 0, 0, 20, 2, 0, 0, 2, 0, 0, 0, 0, 20, 0, 0, 20, 2, 0)
+
+[node name="greyboxing" groups=["Navmeshes"] instance=ExtResource("1_22g4t")]
+
+[node name="Cube" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_3duyb")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Cube" index="0"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cube/StaticBody3D" index="0"]
+shape = SubResource("ConcavePolygonShape3D_22g4t")

@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6x5y1a82do3"]
+
+[ext_resource type="Material" uid="uid://jgfsij8wxsfn" path="res://Materials/Dev/1x1m.tres" id="1_wue1c"]
+[ext_resource type="PackedScene" uid="uid://kuetdndqvbpn" path="res://CSG/rampedBridge_45d_1x3m.tscn" id="2_oqy8a"]
+
+[node name="CSGCombiner3D" type="CSGCombiner3D"]
+material_override = ExtResource("1_wue1c")
+use_collision = true
+
+[node name="Node3D" parent="." instance=ExtResource("2_oqy8a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 5.5)
+
+[node name="Node3D2" parent="." instance=ExtResource("2_oqy8a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5.5)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.45, 0)
+size = Vector3(1, 0.1, 10)

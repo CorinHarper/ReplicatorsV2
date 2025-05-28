@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://cad87lo27sdis"]
+
+[ext_resource type="Material" uid="uid://jgfsij8wxsfn" path="res://Materials/Dev/1x1m.tres" id="1_o5bc5"]
+
+[node name="PositiveCurvature_1m" type="CSGCombiner3D"]
+material_override = ExtResource("1_o5bc5")
+use_collision = true
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 1.0
+height = 1.0
+sides = 32
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.43579, 0.0467529)
+operation = 2
+size = Vector3(4, 2.87158, 5.10083)

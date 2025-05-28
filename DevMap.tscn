@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://wdt75bmcdfcp"]
+
+[ext_resource type="PackedScene" uid="uid://gvrkke8kaewi" path="res://Maps/DevMap/greyboxing.tscn" id="1_0jfic"]
+[ext_resource type="PackedScene" uid="uid://c04o2ln872m8d" path="res://Maps/DevMap/greybox_bridge.tscn" id="2_mhljl"]
+[ext_resource type="PackedScene" uid="uid://dx1i4qn78gae7" path="res://Maps/DevMap/plane_navMesh.tscn" id="3_04u47"]
+[ext_resource type="PackedScene" uid="uid://cjst34xwapgcj" path="res://Maps/DevMap/floor_navMesh.tscn" id="4_8de3x"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="greyboxing" parent="." instance=ExtResource("1_0jfic")]
+visible = false
+
+[node name="greyboxBridge" parent="." instance=ExtResource("2_mhljl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.2722, -8.5)
+
+[node name="Node3D" parent="." instance=ExtResource("3_04u47")]
+transform = Transform3D(2.98023e-08, 1, 0, -1, 2.98023e-08, 0, 0, 0, 1, 0, 1.5, -10)
+
+[node name="Node3D3" parent="." instance=ExtResource("3_04u47")]
+transform = Transform3D(-2.98023e-08, -1, 8.44439e-08, -1, 2.98023e-08, 2.26267e-08, -2.26267e-08, -8.44439e-08, -1, 20, 1.5, -10)
+
+[node name="Node3D4" parent="." instance=ExtResource("3_04u47")]
+transform = Transform3D(2.26267e-08, 1.28155e-07, 1, -1, 2.98023e-08, 2.26267e-08, -2.98023e-08, -1, 1.28155e-07, 10, 1.5, 0)
+
+[node name="Node3D5" parent="." instance=ExtResource("3_04u47")]
+transform = Transform3D(-2.26267e-08, -4.07325e-08, -1, -1, 2.98023e-08, 2.26267e-08, 2.98023e-08, 1, -4.07325e-08, 10, 1.5, -20)
+
+[node name="Node3D2" parent="." instance=ExtResource("4_8de3x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -10)

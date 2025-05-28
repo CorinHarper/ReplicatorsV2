@@ -1,0 +1,9 @@
+res://Player/Player.tscn
+res://Maps/DevMap/greyboxingMaterial.tres
+res://Materials/Dev/1x1m.tres
+res://DevMap.tscn
+res://Maps/DevMap/plane_navMesh.tscn
+res://Maps/DevMap/greybox_bridge.tscn
+res://Maps/DevMap/greyboxing.tscn
+res://Enemy/SpiderBot/spider_bot/spider_bot.tscn
+res://TestLevel.tscn

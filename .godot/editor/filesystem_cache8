@@ -1,0 +1,10 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1748184621
+icon.svg::CompressedTexture2D::3225367564657431902::1747944532::1747944542::1::::<><>::
+TestLevel.tscn::PackedScene::623982857772946006::1747945999::0::1::::<><>::uid://c7bpv6jqo4ul3::::res://Player/Player.tscn
+::res://Player/::1747945999
+CharacterBody3D.gd::GDScript::-1::1740440920::0::1::::<>CharacterBody3D<>::
+Player.tscn::PackedScene::7021898640994730986::1747945999::0::1::::<><>::uid://d1rgs54eo2v2n::::res://Player/CharacterBody3D.gd<>uid://cwebtqhhmj2fq::::res://Player/scale_reference_player.tscn<>uid://dvkewmp340flt::::res://Player/PlayerCamera.gd
+PlayerCamera.gd::GDScript::-1::1738457541::0::1::::<>Camera3D<>::
+scale_reference_player.tscn::PackedScene::6325348937037815502::1747945999::0::1::::<><>::uid://bfb01c5xwc6cs::::res://Player/unreal_mannequin_for_scale_reference.glb
+unreal_mannequin_for_scale_reference.glb::PackedScene::2740993787563373090::1740313407::1747945187::1::::<><>::

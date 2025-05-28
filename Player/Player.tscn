@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://c7bpv6jqo4ul3"]
+
+[ext_resource type="Script" uid="uid://d1rgs54eo2v2n" path="res://Player/CharacterBody3D.gd" id="2_2s541"]
+[ext_resource type="PackedScene" uid="uid://cwebtqhhmj2fq" path="res://Player/scale_reference_player.tscn" id="2_ekwfr"]
+[ext_resource type="Script" uid="uid://dvkewmp340flt" path="res://Player/PlayerCamera.gd" id="3_6ug5o"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_65ofe"]
+height = 2.1
+
+[node name="Player" type="Node3D"]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." groups=["CanOpenDoor", "Player"]]
+script = ExtResource("2_2s541")
+
+[node name="ScaleReference_Model" parent="CharacterBody3D" instance=ExtResource("2_ekwfr")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="Collider" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+shape = SubResource("CapsuleShape3D_65ofe")
+
+[node name="Head" type="Camera3D" parent="CharacterBody3D"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, -0.133931)
+current = true
+fov = 66.3
+script = ExtResource("3_6ug5o")
+
+[node name="RayCast3D" type="RayCast3D" parent="CharacterBody3D/Head"]
+unique_name_in_owner = true
+visible = false
+target_position = Vector3(0, 0, -1)

@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwebtqhhmj2fq"]
+
+[ext_resource type="PackedScene" uid="uid://bfb01c5xwc6cs" path="res://Player/unreal_mannequin_for_scale_reference.glb" id="1_12l5j"]
+
+[node name="ScaleReference_Player" type="Node3D"]
+
+[node name="unreal_mannequin_for_scale_reference" parent="." instance=ExtResource("1_12l5j")]
+transform = Transform3D(0.225, 0, 0, 0, 0.225, 0, 0, 0, 0.225, 0, 0, 0)
+
+[node name="Node3D" type="Node3D" parent="."]
+visible = false
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.914, 0)
+size = Vector3(1, 1.829, 1)

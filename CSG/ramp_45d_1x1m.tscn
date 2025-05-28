@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://chiejnjq0p3lg"]
+
+[ext_resource type="Material" uid="uid://jgfsij8wxsfn" path="res://Materials/Dev/1x1m.tres" id="1_rebpn"]
+
+[node name="Ramp_45d_1x1m" type="CSGCombiner3D"]
+material_override = ExtResource("1_rebpn")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="."]
+transform = Transform3D(0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0, 1, -0.5, 0.5, 0)
+operation = 2
+size = Vector3(1.415, 1.415, 1.415)

@@ -1,7 +1,12 @@
 extends Node3D
 
+@export var mouse_sensitivity: float = 0.005  # Adjust this to control turn sensitivity
+@export var capture_mouse: bool = true  # Whether to capture/hide the mouse cursor
+var mouse_delta_x: float = 0.0
+
 @export var move_speed: float = 2.5
-@export var turn_speed: float = 1.0
+@export var max_turn_speed: float = 3.0  # Radians per second
+
 @export var ground_offset: float = 1.0
 @export var gravity_strength: float = 9.8
 @export var terminal_velocity: float = 10.0
@@ -38,7 +43,22 @@ func _ready():
 		bl_ray.collision_changed.connect(_on_collision_changed)
 	if br_ray:
 		br_ray.collision_changed.connect(_on_collision_changed)
+	
+	# Capture mouse if enabled
+	if capture_mouse:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
+func _input(event):
+	if event is InputEventMouseMotion:
+		mouse_delta_x = event.relative.x
+	
+	# Toggle mouse capture with ESC
+	if event.is_action_pressed("ui_cancel"):
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		else:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
 func _process(delta):
 	# Handle user input FIRST, before terrain alignment
 	_handle_movement(delta)
@@ -85,14 +105,19 @@ func _align_to_terrain(delta):
 	var distance = transform.basis.y.dot(target_pos - position)
 	position = lerp(position, position + transform.basis.y * distance, move_speed * delta)
 
+
 func _handle_movement(delta):
 	var dir = Input.get_axis('ui_down', 'ui_up')
 	translate(Vector3(0, 0, -dir) * move_speed * delta)
 	
-	var a_dir = Input.get_axis('ui_right', 'ui_left')
-	rotate_object_local(Vector3.UP, a_dir * turn_speed * delta)
+	# Calculate turn amount and clamp it
+	var turn_amount = -mouse_delta_x * mouse_sensitivity
+	turn_amount = clamp(turn_amount, -max_turn_speed * delta, max_turn_speed * delta)
 	
-
+	rotate_object_local(Vector3.UP, turn_amount)
+	
+	mouse_delta_x = 0.0
+	
 
 func _on_collision_changed(leg_name: String, is_colliding: bool):
 	collision_states[leg_name] = is_colliding

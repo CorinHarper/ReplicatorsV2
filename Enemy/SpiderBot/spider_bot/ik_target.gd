@@ -1,8 +1,8 @@
 extends Marker3D
 
 @export var step_target: Node3D
-var step_distance: float = .3
-var step_speed: float = .05
+@export var step_distance: float = .3
+@export var step_speed: float = .05
 @export var adjacent_target: Node3D
 @export var opposite_target: Node3D
 

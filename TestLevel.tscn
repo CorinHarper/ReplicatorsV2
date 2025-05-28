@@ -29,7 +29,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
 environment = SubResource("Environment_y1jsw")
 
 [node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 0.290371, 0.26464)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 3.08581, 0.26464)
 
 [node name="Camera3D" type="Camera3D" parent="SpiderBot"]
 transform = Transform3D(1, 0, 0, 0, 0.928589, 0.371108, 0, -0.371108, 0.928589, 0, 0.316, 0.653)

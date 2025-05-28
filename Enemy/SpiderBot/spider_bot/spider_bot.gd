@@ -3,7 +3,7 @@ extends Node3D
 @export var move_speed: float = 1.0
 @export var turn_speed: float = 3.0
 @export var ground_offset: float = 0.15
-@export var gravity_strength: float = -9.8
+@export var gravity_strength: float = 9.8
 @export var terminal_velocity: float = 100.0
 @export var mouse_sensitivity: float = 0.005
 @export var capture_mouse: bool = true
@@ -29,8 +29,15 @@ var collision_states = {
 	"BackRightRay": false
 }
 
+# Ground detection ray
+@onready var ground_ray = $GroundRay
+var ground_ray_colliding: bool = false
 var vertical_velocity: float = 0.0
 var is_grounded: bool = true
+# Add this export variable with your other exports:
+@export var fall_alignment_speed: float = 2.0  # How quickly to align when falling
+
+
 var mouse_delta_x: float = 0.0
 var mouse_delta_y: float = 0.0
 var current_pitch: float = 0.0
@@ -50,6 +57,7 @@ func _ready():
 		bl_ray.collision_changed.connect(_on_collision_changed)
 	if br_ray:
 		br_ray.collision_changed.connect(_on_collision_changed)
+
 	
 	if capture_mouse:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -147,18 +155,77 @@ func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basi
 	result.z *= scale.z 
 	
 	return result
-
+	
+# Replace your _update_grounded_state function:
 func _update_grounded_state():
-	var temp_state: bool = false
-	for key in collision_states: 
-		if collision_states[key] == true:
-			temp_state = true
-	is_grounded = temp_state
+	if is_grounded:
+		# When grounded, lose ground contact if NO legs are touching
+		is_grounded = collision_states.values().any(func(colliding): return colliding)
+		# disable leg rays the moment none are colliding 
+		if is_grounded == false:
+			_disable_leg_rays()
+	else:
+		# When airborne, only regain ground contact via ground ray
+		if ground_ray and ground_ray.is_colliding():
+			# enable leg rays only once the ground ray is colliding
+			is_grounded = true
+			_enable_leg_rays()
 
+func _disable_leg_rays(): 
+	fl_ray.enabled = false
+	fr_ray.enabled = false
+	bl_ray.enabled = false
+	br_ray.enabled = false
+	
+func _enable_leg_rays(): 
+	fl_ray.enabled = true
+	fr_ray.enabled = true
+	bl_ray.enabled = true
+	br_ray.enabled = true
+	
+	
 func _apply_gravity(delta):
+	# Increase downward velocity
 	vertical_velocity += gravity_strength * delta
+	# Clamp to terminal velocity
 	vertical_velocity = min(vertical_velocity, terminal_velocity)
-	translate(to_global(Vector3.DOWN) * vertical_velocity * delta)
+	
+	# Apply gravity in GLOBAL world down direction
+	global_position += Vector3.DOWN * vertical_velocity * delta
+	
+	# Align spider to fall "feet down"
+	_align_to_gravity(delta)
+
+
+# Add this new function:
+func _align_to_gravity(delta):
+	# Get current forward direction (negative Z in local space)
+	var forward = -transform.basis.z
+	
+	# Create a new basis that's upright but maintains forward direction
+	var target_basis = Basis()
+	target_basis.y = Vector3.UP
+	# Remove any vertical component from forward direction
+	forward.y = 0
+	forward = forward.normalized()
+	
+	# If forward is too small (spider was facing straight up/down), use a default
+	if forward.length() < 0.1:
+		forward = -transform.basis.x  # Use right direction as fallback
+		forward.y = 0
+		forward = forward.normalized()
+	
+	target_basis.z = -forward
+	target_basis.x = target_basis.y.cross(target_basis.z)
+	target_basis = target_basis.orthonormalized()
+	
+	# Apply scale
+	target_basis.x *= scale.x
+	target_basis.y *= scale.y
+	target_basis.z *= scale.z
+	
+	# Smoothly rotate towards upright orientation
+	transform.basis = lerp(transform.basis, target_basis, fall_alignment_speed * delta).orthonormalized()
 
 func _on_collision_changed(leg_name: String, is_colliding: bool):
 	collision_states[leg_name] = is_colliding

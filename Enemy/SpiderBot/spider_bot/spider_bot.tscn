@@ -98,6 +98,7 @@ target_node = NodePath("../../../BackRightIKTarget")
 script = ExtResource("1_n6l5c")
 
 [node name="StepTargetContainer" type="Node3D" parent="." index="2"]
+visible = false
 script = ExtResource("5_yguvh")
 offset = 3.0
 
@@ -168,3 +169,6 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget")
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
+
+[node name="GroundRay" type="RayCast3D" parent="." index="7"]
+target_position = Vector3(0, -0.5, 0)

@@ -8,7 +8,8 @@
 [ext_resource type="Script" uid="uid://bjm4aeaua26ug" path="res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd" id="5_yguvh"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_gmc3e"]
-radius = 0.135092
+margin = 0.165
+radius = 0.1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwxtc"]
 albedo_color = Color(0.396078, 0.396078, 0.396078, 1)
@@ -25,7 +26,7 @@ albedo_color = Color(0.52549, 0.52549, 0.52549, 1)
 [node name="SpiderBot" instance=ExtResource("1_vovvw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155261, 0)
 script = ExtResource("2_kfpvc")
-ground_offset = 0.15
+move_speed = 2.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." index="0"]
 
@@ -102,6 +103,7 @@ offset = 3.0
 
 [node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="0" node_paths=PackedStringArray("step_target")]
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, -0.25, 0.5, -0.25)
+target_position = Vector3(0, -3, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("FrontLeftStepTarget")
 
@@ -110,6 +112,7 @@ transform = Transform3D(0.999903, 1.4028e-08, -0.0139622, -1.31666e-07, 1, -5.21
 
 [node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, 0.25, 0.5, -0.25)
+target_position = Vector3(0, -3, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("FrontRightStepTarget")
 
@@ -118,6 +121,7 @@ transform = Transform3D(0.985133, 0.171244, 0.0137501, -0.17101, 0.969846, 0.173
 
 [node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, -0.25, 0.5, 0.25)
+target_position = Vector3(0, -3, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackLeftStepTarget")
 
@@ -126,6 +130,7 @@ transform = Transform3D(0.985133, -0.171244, 0.0137501, 0.17101, 0.969848, -0.17
 
 [node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0.25, 0.5, 0.25)
+target_position = Vector3(0, -3, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackRightStepTarget")
 

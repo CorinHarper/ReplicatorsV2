@@ -32,4 +32,6 @@ environment = SubResource("Environment_y1jsw")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 0.290371, 0.26464)
 
 [node name="Camera3D" type="Camera3D" parent="SpiderBot"]
-transform = Transform3D(1, 0, 0, 0, 0.676645, 0.736309, 0, -0.736309, 0.676645, -0.0826885, 0.886695, 0.852844)
+transform = Transform3D(1, 0, 0, 0, 0.928589, 0.371108, 0, -0.371108, 0.928589, 0, 0.316, 0.653)
+current = true
+fov = 80.0

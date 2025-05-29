@@ -28,10 +28,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_y1jsw")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-0.663665, 0.547439, -0.509763, 0, 0.681475, 0.731841, 0.74803, 0.485698, -0.452271, -4.15296, 3.38622, -4.65099)
+[node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 2.97785, 0.26464)
+pitch_min = -50.0
+pitch_max = 50.0
+body_length = 0.3
+
+[node name="Camera3D" type="Camera3D" parent="SpiderBot"]
+transform = Transform3D(1, 0, 0, 0, 0.854359, 0.519683, 0, -0.519683, 0.854359, 0, 1.01412, 1.31989)
 current = true
 fov = 80.0
-
-[node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.937903, 4.00921, 0.26464)

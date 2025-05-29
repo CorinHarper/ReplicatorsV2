@@ -8,9 +8,12 @@ extends Node3D
 @export var mouse_sensitivity: float = 0.005
 @export var capture_mouse: bool = true
 @export var max_turn_speed: float = 2.0
-@export var pitch_min: float = -85.0  # Reduced from 90 to prevent gimbal lock
-@export var pitch_max: float = 85.0   # Reduced from 90 to prevent gimbal lock
+@export var pitch_min: float = -85.0
+@export var pitch_max: float = 85.0
 @export var pitch_sensitivity: float = 0.005
+# New exports for pitch compensation
+@export var pitch_compensation_factor: float = 0.5  # How much to lift/lower based on pitch
+@export var body_length: float = 1.0  # Approximate length of spider body
 
 @onready var fl_leg = $FrontLeftIKTarget
 @onready var fr_leg = $FrontRightIKTarget
@@ -35,9 +38,7 @@ signal grounded_state_changed(is_grounded: bool)
 var ground_ray_colliding: bool = false
 var vertical_velocity: float = 0.0
 var is_grounded: bool = true
-# Add this export variable with your other exports:
-@export var fall_alignment_speed: float = 5.0  # How quickly to align when falling
-
+@export var fall_alignment_speed: float = 5.0
 
 var mouse_delta_x: float = 0.0
 var mouse_delta_y: float = 0.0
@@ -58,7 +59,6 @@ func _ready():
 		bl_ray.collision_changed.connect(_on_collision_changed)
 	if br_ray:
 		br_ray.collision_changed.connect(_on_collision_changed)
-
 	
 	if capture_mouse:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -139,9 +139,17 @@ func _align_to_terrain(delta):
 	# Apply the terrain basis (without pitch)
 	transform.basis = terrain_basis
 	
-	# Position adjustment
+	# Position adjustment with pitch compensation
 	var avg = (fl_leg.position + fr_leg.position + bl_leg.position + br_leg.position) / 4
-	var target_pos = avg + transform.basis.y * ground_offset
+	var base_offset = ground_offset
+	
+	# Calculate additional height needed based on pitch
+	# When looking up (negative pitch), raise the spider
+	# When looking down (positive pitch), raise the spider
+	var pitch_height_offset = abs(sin(current_pitch)) * body_length * pitch_compensation_factor
+	
+	var total_offset = base_offset + pitch_height_offset
+	var target_pos = avg + transform.basis.y * total_offset
 	var distance = transform.basis.y.dot(target_pos - position)
 	position = lerp(position, position + transform.basis.y * distance, move_speed * delta)
 
@@ -159,22 +167,16 @@ func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basi
 	
 	return result
 	
-# Replace your _update_grounded_state function:
 func _update_grounded_state():
 	var previous_grounded = is_grounded
 
 	if is_grounded:
 		# When grounded, lose ground contact if NO legs are touching
 		is_grounded = collision_states.values().any(func(colliding): return colliding)
-		# disable leg rays the moment none are colliding 
-		#if is_grounded == false:
-			#_disable_leg_rays()
 	else:
 		# When airborne, only regain ground contact via ground ray
 		if ground_ray and ground_ray.is_colliding():
-			# enable leg rays only once the ground ray is colliding
 			is_grounded = true
-			#_enable_leg_rays()
 			
 	# Emit signal if state changed
 	if previous_grounded != is_grounded:
@@ -192,7 +194,6 @@ func _enable_leg_rays():
 	bl_ray.enabled = true
 	br_ray.enabled = true
 	
-	
 func _apply_gravity(delta):
 	# Increase downward velocity
 	vertical_velocity += gravity_strength * delta
@@ -205,8 +206,6 @@ func _apply_gravity(delta):
 	# Align spider to fall "feet down"
 	_align_to_gravity(delta)
 
-
-# Add this new function:
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
 	var forward = -transform.basis.z
@@ -252,10 +251,6 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	
 	return result
 
-
-
-
-
 func _on_grounded_state_changed(grounded: bool):
 	# Notify all IK targets about grounding state
 	if fl_leg:
@@ -276,3 +271,11 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
+
+# Getter for current pitch - used by StepTargetContainer
+func _get_current_pitch() -> float:
+	return current_pitch
+
+# Getter for terrain basis - used by StepTargetContainer
+func _get_terrain_basis() -> Basis:
+	return terrain_basis

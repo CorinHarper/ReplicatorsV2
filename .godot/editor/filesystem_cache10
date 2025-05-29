@@ -1,11 +1,11 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1748457831
+::res://::1748507525
 DebugColorComponent.gd::GDScript/GDScript::2365224284009972434::1748280440::0::1::::DebugColorComponent<>Node<><>0<>0<><>::
-DevMap.tscn::PackedScene::1551560039359741535::1748423759::0::1::::<><><>0<>0<><>::uid://gvrkke8kaewi::::res://Maps/DevMap/greyboxing.tscn<>uid://c04o2ln872m8d::::res://Maps/DevMap/greybox_bridge.tscn<>uid://dx1i4qn78gae7::::res://Maps/DevMap/plane_navMesh.tscn<>uid://cjst34xwapgcj::::res://Maps/DevMap/floor_navMesh.tscn
+DevMap.tscn::PackedScene::1551560039359741535::1748473341::0::1::::<><><>0<>0<><>::uid://gvrkke8kaewi::::res://Maps/DevMap/greyboxing.tscn<>uid://c04o2ln872m8d::::res://Maps/DevMap/greybox_bridge.tscn<>uid://dx1i4qn78gae7::::res://Maps/DevMap/plane_navMesh.tscn<>uid://cjst34xwapgcj::::res://Maps/DevMap/floor_navMesh.tscn
 icon.svg::CompressedTexture2D/CompressedTexture2D::3225367564657431902::1747944532::1747944542::1::::<><><>0<>0<>a836ab9951ec97312905450f73e0f848<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
-README.md::TextFile::-1::1748455104::0::1::::<><><>0<>0<><>::
+README.md::TextFile/TextFile::-1::1748455104::0::1::::<><><>0<>0<><>::
 replicator_v1.gd::GDScript/GDScript::3569433400926442567::1748280440::0::1::::<>CharacterBody3D<><>0<>0<><>::
-TestLevel.tscn::PackedScene::623982857772946006::1748423759::0::1::::<><><>0<>0<><>::uid://cabgrr2bvykhs::::res://Enemy/SpiderBot/spider_bot/spider_bot.tscn<>uid://wdt75bmcdfcp::::res://DevMap.tscn
+TestLevel.tscn::PackedScene::623982857772946006::1748473341::0::1::::<><><>0<>0<><>::uid://cabgrr2bvykhs::::res://Enemy/SpiderBot/spider_bot/spider_bot.tscn<>uid://wdt75bmcdfcp::::res://DevMap.tscn
 ::res://addons/::1748455153
 ::res://addons/debug_draw_3d/::1748455153
 debug_draw_3d.gdextension::GDExtension/GDExtension::1307723806687219837::1748202173::0::1::::<><><>0<>0<><>::
@@ -27,18 +27,18 @@ obstacle.tres::StandardMaterial3D/StandardMaterial3D::8333791012699608287::17482
 ::res://Enemy/SpiderBot/sky_box/::1748455153
 kloofendal_48d_partly_cloudy_puresky_4k.exr::CompressedTexture2D/CompressedTexture2D::4609745514967735293::1748294841::1748371764::1::::<><><>0<>0<>35de16d51c47a42dffeeeb73c6dcf6f8<>res://.godot/imported/kloofendal_48d_partly_cloudy_puresky_4k.exr-7c99b8bb18fecae2dfe5296597ce8f50.bptc.ctex::
 spider_bot.tscn::PackedScene/PackedScene::4775301340274369176::1748294867::0::1::::<><><>0<>0<><>::uid://dkj7dvt1q82co::::res://spider_bot/start_ik.gd<>uid://b1n5rqw53onuo::::res://spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://spider_bot/spider_bot.gd<>uid://ttw5il2nhsd0::::res://spider_bot/step_ray.gd<>uid://cjolrusr43m3e::::res://spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://spider_bot/StepTargetContainer.gd
-::res://Enemy/SpiderBot/spider_bot/::1748455153
-ik_target.gd::GDScript/GDScript::5434141573187898428::1748375205::0::1::::<>Marker3D<><>0<>0<><>::
+::res://Enemy/SpiderBot/spider_bot/::1748473341
+ik_target.gd::GDScript::5434141573187898428::1748473006::0::1::::<>Marker3D<><>0<>0<><>::
 spider_bot2.tscn::PackedScene/PackedScene::8626503125949796876::1748294867::0::1::::<><><>0<>0<><>::uid://b1n5rqw53onuo::::res://spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://spider_bot/spider_bot.gd<>uid://dkj7dvt1q82co::::res://spider_bot/start_ik.gd<>uid://cjolrusr43m3e::::res://spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://spider_bot/StepTargetContainer.gd<>uid://ttw5il2nhsd0::::res://spider_bot/step_ray.gd
-spider_bot.gd::GDScript/GDScript::5107276066041646335::1748387154::0::1::::<>Node3D<><>0<>0<><>::
-spider_bot.tscn::PackedScene::4775301340274369176::1748423759::0::1::::<><><>0<>0<><>::uid://dkj7dvt1q82co::::res://Enemy/SpiderBot/spider_bot/start_ik.gd<>uid://b1n5rqw53onuo::::res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://Enemy/SpiderBot/spider_bot/spider_bot.gd<>uid://ttw5il2nhsd0::::res://Enemy/SpiderBot/spider_bot/step_ray.gd<>uid://cjolrusr43m3e::::res://Enemy/SpiderBot/spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd
+spider_bot.gd::GDScript::5107276066041646335::1748473152::0::1::::<>Node3D<><>0<>0<><>::
+spider_bot.tscn::PackedScene::4775301340274369176::1748473341::0::1::::<><><>0<>0<><>::uid://dkj7dvt1q82co::::res://Enemy/SpiderBot/spider_bot/start_ik.gd<>uid://b1n5rqw53onuo::::res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://Enemy/SpiderBot/spider_bot/spider_bot.gd<>uid://ttw5il2nhsd0::::res://Enemy/SpiderBot/spider_bot/step_ray.gd<>uid://cjolrusr43m3e::::res://Enemy/SpiderBot/spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd
 spider_bot_model.glb::PackedScene/PackedScene::818836409660223216::1748277448::1748371764::1::::<><><>0<>0<>18b5fe483a5e28c04dc9bb2a467ec5d9<>res://.godot/imported/spider_bot_model.glb-bb2991b451ac58809b85d61680fcff51.scn::
 spider_bot_model.gltf::PackedScene/PackedScene::4240020273124442842::1748294841::1748371764::1::::<><><>0<>0<>f4a81953450310c18715ea1f77d02d53<>res://.godot/imported/spider_bot_model.gltf-8c49198c8a4a9ba037bdd6ee5d173faa.scn::
 spider_bot_scaled.tscn::PackedScene/PackedScene::4897661542108916351::1748294867::0::1::::<><><>0<>0<><>::uid://b1n5rqw53onuo::::res://spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://spider_bot/spider_bot.gd<>uid://dkj7dvt1q82co::::res://spider_bot/start_ik.gd<>uid://cjolrusr43m3e::::res://spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://spider_bot/StepTargetContainer.gd<>uid://ttw5il2nhsd0::::res://spider_bot/step_ray.gd
 spider_bot_scaledFix.tscn::PackedScene/PackedScene::7429277127526575858::1748294867::0::1::::<><><>0<>0<><>::uid://b1n5rqw53onuo::::res://spider_bot/spider_bot_model.gltf<>uid://ce1adc065qpu2::::res://spider_bot/spider_bot.gd<>uid://dkj7dvt1q82co::::res://spider_bot/start_ik.gd<>uid://cjolrusr43m3e::::res://spider_bot/ik_target.gd<>uid://bjm4aeaua26ug::::res://spider_bot/StepTargetContainer.gd<>uid://ttw5il2nhsd0::::res://spider_bot/step_ray.gd
 start_ik.gd::GDScript/GDScript::7881679321942074182::1748294841::0::1::::<>SkeletonIK3D<><>0<>1<><>::
 StepTargetContainer.gd::GDScript/GDScript::3044653813277544066::1748298853::0::1::::<>Node3D<><>0<>0<><>::
-step_ray.gd::GDScript/GDScript::1374200992531834735::1748387197::0::1::::<>RayCast3D<><>0<>0<><>::
+step_ray.gd::GDScript::1374200992531834735::1748472805::0::1::::<>RayCast3D<><>0<>0<><>::
 ::res://Enemy/SpiderBot/textures/::1748455153
 ::res://Enemy/SpiderBot/textures/prototype/::1748455153
 ::res://Enemy/SpiderBot/textures/prototype/dark/::1748455153
@@ -139,24 +139,24 @@ PixelatedElegance.ttf::FontFile/FontFile::66082895483767657::1748202174::1748202
 Roboto-Bold.ttf::FontFile/FontFile::316043257971280746::1748202174::1748202174::1::::<><><>0<>0<>03a4ce0304bc0343579e85101328a339<>res://.godot/imported/Roboto-Bold.ttf-3674de3d9ad3ee757cd4b4a89f1e126d.fontdata::
 VisualizerAudioBus.tres::AudioBusLayout/AudioBusLayout::2284711204667567248::1748202174::0::1::::<><><>0<>0<><>::
 ::res://Maps/::1748455153
-::res://Maps/DevMap/::1748455153
+::res://Maps/DevMap/::1748473341
 Default_NavMeshConfig.tres::NavigationMesh/NavigationMesh::5035180656849644452::1748260812::0::1::::<><><>0<>0<><>::
 floor_navMesh.tscn::PackedScene/PackedScene::5442904944501301085::1748371843::0::1::::<><><>0<>0<><>::
 greyboxBridge.blend::PackedScene/PackedScene::7081372225940350429::1748268381::1748268385::1::::<><><>0<>0<>8a41f5e14d805f59e877df549f807b66<>res://.godot/imported/greyboxBridge.blend-9e484f2b30559915377d00df2b1538e6.scn::
 greyboxing.blend::PackedScene/PackedScene::1995450919856760569::1748257781::1748257788::1::::<><><>0<>0<>ab329cf1d257b3fddb3b9c5d6be4bbec<>res://.godot/imported/greyboxing.blend-e20a589a835e1be850ed64a7938a5662.scn::
-greyboxing.tscn::PackedScene::465535574404985284::1748423759::0::1::::<><><>0<>0<><>::uid://3ou1xuad0xqf::::res://Maps/DevMap/greyboxing.blend<>uid://dwcburwy0beuy::::res://Maps/DevMap/greyboxingMaterial.tres
-greyboxingMaterial.tres::StandardMaterial3D::8707642727501552360::1748423714::0::1::::<><><>0<>0<><>::
-greybox_bridge.tscn::PackedScene::6588328266921424845::1748423759::0::1::::<><><>0<>0<><>::uid://c75jfv35chhx2::::res://Maps/DevMap/greyboxBridge.blend<>uid://jgfsij8wxsfn::::res://Materials/Dev/1x1m.tres
-plane_navMesh.tscn::PackedScene::8827817662279304232::1748423759::0::1::::<><><>0<>0<><>::
+greyboxing.tscn::PackedScene::465535574404985284::1748473341::0::1::::<><><>0<>0<><>::uid://3ou1xuad0xqf::::res://Maps/DevMap/greyboxing.blend<>uid://dwcburwy0beuy::::res://Maps/DevMap/greyboxingMaterial.tres
+greyboxingMaterial.tres::StandardMaterial3D::8707642727501552360::1748458414::0::1::::<><><>0<>0<><>::
+greybox_bridge.tscn::PackedScene::6588328266921424845::1748473341::0::1::::<><><>0<>0<><>::uid://c75jfv35chhx2::::res://Maps/DevMap/greyboxBridge.blend<>uid://jgfsij8wxsfn::::res://Materials/Dev/1x1m.tres
+plane_navMesh.tscn::PackedScene::8827817662279304232::1748473341::0::1::::<><><>0<>0<><>::
 spiderBotModel.blend::PackedScene/PackedScene::1818406788110076683::1748301481::1748371772::1::::<><><>0<>0<>cbd7dcf27513ee6941e82986ec129e4f<>res://.godot/imported/spiderBotModel.blend-54902a88831e200440d896de09b27b99.scn::
 ::res://Materials/::1748455153
-::res://Materials/Dev/::1748455153
-1x1m.tres::StandardMaterial3D::644422024140504823::1748423714::0::1::::<><><>0<>0<><>::uid://cb2gb81hbi5h1::::res://Materials/Dev/Name_1m x 1m (1).png
+::res://Materials/Dev/::1748458414
+1x1m.tres::StandardMaterial3D::644422024140504823::1748458414::0::1::::<><><>0<>0<><>::uid://cb2gb81hbi5h1::::res://Materials/Dev/Name_1m x 1m (1).png
 Name_1m x 1m (1).png::CompressedTexture2D/CompressedTexture2D::4899136271889555376::1748185218::1748185294::1::::<><><>0<>0<>d8cee97c9e63eb6a771dc816cc221df8<>res://.godot/imported/Name_1m x 1m (1).png-edb863bd1eb0b6146f0ab43bcb043ea7.s3tc.ctex::
 Name_5m x 5m.png::CompressedTexture2D/CompressedTexture2D::418752782380931354::1748185532::1748185548::1::::<><><>0<>0<>381f9f2b21f253e8c3a0cdc9f2463f81<>res://.godot/imported/Name_5m x 5m.png-972c93ac37fbe34706ea0ed861e81a28.s3tc.ctex::
-::res://Player/::1748455153
+::res://Player/::1748473341
 CharacterBody3D.gd::GDScript/GDScript::9019664474435417455::1748385310::0::1::::<>CharacterBody3D<><>0<>0<><>::
-Player.tscn::PackedScene::7021898640994730986::1748423759::0::1::::<><><>0<>0<><>::uid://d1rgs54eo2v2n::::res://Player/CharacterBody3D.gd<>uid://cwebtqhhmj2fq::::res://Player/scale_reference_player.tscn<>uid://dvkewmp340flt::::res://Player/PlayerCamera.gd
+Player.tscn::PackedScene::7021898640994730986::1748473341::0::1::::<><><>0<>0<><>::uid://d1rgs54eo2v2n::::res://Player/CharacterBody3D.gd<>uid://cwebtqhhmj2fq::::res://Player/scale_reference_player.tscn<>uid://dvkewmp340flt::::res://Player/PlayerCamera.gd
 PlayerCamera.gd::GDScript/GDScript::8654154355219756917::1738453941::0::1::::<>Camera3D<><>0<>0<><>::
 scale_reference_player.tscn::PackedScene/PackedScene::6325348937037815502::1748278142::0::1::::<><><>0<>0<><>::uid://bfb01c5xwc6cs::::res://Player/unreal_mannequin_for_scale_reference.glb
 unreal_mannequin_for_scale_reference.glb::PackedScene/PackedScene::2740993787563373090::1740309807::1747945187::1::::<><><>0<>0<>9415114b9063c8a3db69dad6892c2fd8<>res://.godot/imported/unreal_mannequin_for_scale_reference.glb-ad48e816fd3cd576eb47358866e81ed6.scn::

@@ -10,3 +10,11 @@ func _process(delta):
 	global_position = parent.global_position + velocity * offset
 	
 	previous_position = parent.global_position
+	
+	# Compensate ONLY for parent's pitch to keep rays pointing at consistent angles
+	if parent and parent.has_method("_get_current_pitch") and parent.has_method("_get_terrain_basis"):
+		var parent_pitch = parent._get_current_pitch()
+		var terrain_basis = parent._get_terrain_basis()
+		
+		# Simply use the terrain basis - it already has the correct yaw but no pitch
+		global_transform.basis = terrain_basis

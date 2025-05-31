@@ -48,6 +48,7 @@ var current_pitch: float = 0.0
 var terrain_basis: Basis
 
 func _ready():
+	Engine.time_scale = 1.0
 	# Initialize terrain basis
 	terrain_basis = transform.basis
 	
@@ -268,7 +269,7 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
-	print("HERE")
+
 	
 # Getter for current pitch - used by StepTargetContainer
 func _get_current_pitch() -> float:

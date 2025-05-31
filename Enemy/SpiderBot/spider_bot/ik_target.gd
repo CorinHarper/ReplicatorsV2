@@ -1,4 +1,4 @@
-# Changes to ik_target.gd:
+# Fixed ik_target.gd with proper falling behavior
 
 extends Marker3D
 
@@ -10,13 +10,15 @@ var step_speed: float = .05
 
 var is_stepping := false
 var is_grounded: bool = true
-var default_offset: Vector3
-@export var retract_speed: float = 5.0  # Increased from 1.0 for more noticeable effect
+var default_local_position: Vector3  # Store the initial local position relative to owner
+@export var retract_speed: float = .05
 
 func _ready():
-	# Since this node has top_level = true, we need to store its position relative to the spider
+	# Store the initial local position relative to the spider bot
+	# Since top_level = true, we need to convert global position to local
 	if owner:
-		default_offset = owner.to_global(global_position)
+		default_local_position = owner.to_local(global_position)
+		print("IK Target ", name, " default local position: ", default_local_position)
 
 func _process(delta):
 	if is_grounded:
@@ -25,14 +27,16 @@ func _process(delta):
 			step()
 			opposite_target.step()
 	else:
-		# When falling, move to default position relative to spider
-		# default_offset is already in local space, convert it to global
-		var target_pos = owner.to_global(default_offset)
-		global_position = lerp(global_position, target_pos, retract_speed * delta)
-		
-		# Move step target to match
-		if step_target:
-			step_target.global_position = global_position
+		# When falling, move IK target to its default position underneath the spider
+		if owner:
+			fall()
+			# Convert local position back to global based on spider's current transform
+		#	var target_global_pos = owner.to_global(default_local_position)
+		#	global_position = lerp(global_position, target_global_pos, retract_speed * delta)
+			
+			# Also move the step target to stay with the IK target
+		#	if step_target:
+			
 
 func step():
 	var target_pos = step_target.global_position
@@ -43,7 +47,16 @@ func step():
 	t.tween_property(self, "global_position", half_way + owner.basis.y * 0.2, step_speed)
 	t.tween_property(self, "global_position", target_pos, step_speed)
 	t.tween_callback(func(): is_stepping = false)
-
+	
+func fall():
+	var target_pos = step_target.global_position
+	#var half_way = (global_position + step_target.global_position) / 2
+	is_stepping = true
+	
+	var t = get_tree().create_tween()
+	#t.tween_property(self, "global_position", half_way + owner.basis.y * 1.0, retract_speed)
+	t.tween_property(self, "global_position", target_pos, retract_speed)
+	t.tween_callback(func(): is_stepping = false)
 
 func set_grounded(grounded: bool):
 	print("IK Target ", name, " grounded state changed to: ", grounded)
@@ -51,4 +64,6 @@ func set_grounded(grounded: bool):
 	# Kill any active tweens when falling
 	if not grounded:
 		is_stepping = false
-		get_tree().create_tween().kill()
+		var tween = get_tree().create_tween()
+		if tween:
+			tween.kill()

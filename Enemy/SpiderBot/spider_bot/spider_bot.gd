@@ -184,8 +184,8 @@ func _update_grounded_state():
 			terrain_basis = transform.basis
 			
 	# Emit signal if state changed
-	#if previous_grounded != is_grounded:
-	#	grounded_state_changed.emit(is_grounded)
+	if previous_grounded != is_grounded:
+		grounded_state_changed.emit(is_grounded)
 
 
 func _apply_gravity(delta):

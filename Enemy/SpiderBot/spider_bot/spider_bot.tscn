@@ -7,9 +7,8 @@
 [ext_resource type="Script" uid="uid://cjolrusr43m3e" path="res://Enemy/SpiderBot/spider_bot/ik_target.gd" id="4_p25cf"]
 [ext_resource type="Script" uid="uid://bjm4aeaua26ug" path="res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd" id="5_yguvh"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_gmc3e"]
-margin = 0.165
-radius = 0.1
+[sub_resource type="BoxShape3D" id="BoxShape3D_gmc3e"]
+size = Vector3(0.3, 0.1, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwxtc"]
 albedo_color = Color(0.396078, 0.396078, 0.396078, 1)
@@ -27,11 +26,12 @@ albedo_color = Color(0.52549, 0.52549, 0.52549, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155261, 0)
 script = ExtResource("2_kfpvc")
 move_speed = 2.0
+fall_alignment_speed = 10.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." index="0"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
-shape = SubResource("SphereShape3D_gmc3e")
+shape = SubResource("BoxShape3D_gmc3e")
 
 [node name="Armature" parent="." index="1"]
 transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
@@ -104,7 +104,7 @@ offset = 3.0
 [node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="0" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, -0.25, 0.5, -0.25)
-target_position = Vector3(0, -3, 0)
+target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("FrontLeftStepTarget")
 
@@ -114,7 +114,7 @@ transform = Transform3D(0.999903, 1.4028e-08, -0.0139622, -1.31666e-07, 1, -5.21
 [node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, 0.25, 0.5, -0.25)
-target_position = Vector3(0, -3, 0)
+target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("FrontRightStepTarget")
 
@@ -124,7 +124,7 @@ transform = Transform3D(0.985133, 0.171244, 0.0137501, -0.17101, 0.969846, 0.173
 [node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, -0.25, 0.5, 0.25)
-target_position = Vector3(0, -3, 0)
+target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackLeftStepTarget")
 
@@ -134,7 +134,7 @@ transform = Transform3D(0.985133, -0.171244, 0.0137501, 0.17101, 0.969848, -0.17
 [node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, 0.25, 0.5, 0.25)
-target_position = Vector3(0, -3, 0)
+target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackRightStepTarget")
 
@@ -149,6 +149,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontLeftRay/FrontLeftStepTarget")
 adjacent_target = NodePath("../FrontRightIKTarget")
 opposite_target = NodePath("../BackRightIKTarget")
+retract_speed = 1000.0
 
 [node name="FrontRightIKTarget" type="Marker3D" parent="." index="4" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
@@ -176,5 +177,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget")
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
+retract_speed = 0.0
 
 [node name="GroundRay" type="RayCast3D" parent="." index="7"]
+target_position = Vector3(0, -0.3, 0)

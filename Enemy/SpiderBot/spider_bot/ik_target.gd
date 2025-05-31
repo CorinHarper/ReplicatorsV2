@@ -11,10 +11,10 @@ var step_speed: float = .05
 var is_stepping := false
 var is_grounded: bool = true
 var default_offset: Vector3
-@export var retract_speed: float = 1.0
+@export var retract_speed: float = 5.0  # Increased from 1.0 for more noticeable effect
 
 func _ready():
-	# Store the default offset from owner (spider bot) to this IK target
+	# Since this node has top_level = true, we need to store its position relative to the spider
 	if owner:
 		default_offset = owner.to_local(global_position)
 
@@ -25,10 +25,15 @@ func _process(delta):
 			step()
 			opposite_target.step()
 	else:
-		# When falling, move step target to default position relative to spider
-		if step_target and owner:
-			var target_global_pos = owner.to_global(default_offset)
-			step_target.global_position = lerp(step_target.global_position, target_global_pos, retract_speed * delta)
+		# When falling, move to default position relative to spider
+		# Since we're top_level, we need to calculate the global position
+
+		var target_pos = owner.to_local(default_offset)
+		global_position = lerp(global_position, target_pos, retract_speed)
+		
+		# Move step target to match
+		if step_target:
+			step_target.global_position = global_position
 
 func step():
 	var target_pos = step_target.global_position

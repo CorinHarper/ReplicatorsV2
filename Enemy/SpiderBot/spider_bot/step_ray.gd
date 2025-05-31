@@ -10,10 +10,11 @@ var default_offset: Vector3
 func _ready():
 	# Store default position of step target relative to spider bot
 	if step_target and owner:
-		default_offset = owner.to_local(step_target.global_position)
+		default_offset = step_target.global_position
 
 func _physics_process(delta):
 	if is_grounded:
+		
 		# Normal ray behavior when grounded
 		var is_currently_colliding = is_colliding()
 		var hit_point = get_collision_point()
@@ -28,8 +29,8 @@ func _physics_process(delta):
 	else:
 		# When falling, lerp step target to default position
 		if step_target and owner:
-			var target_pos = owner.to_global(default_offset)
-			step_target.global_position = lerp(step_target.global_position, target_pos, 3.0 * delta)
+			var target_pos = owner.to_local(Vector3(0,0,0))
+			step_target.global_position = lerp(step_target.global_position, target_pos, 1) #3.0 * delta)
 
 func set_grounded(grounded: bool):
 	is_grounded = grounded

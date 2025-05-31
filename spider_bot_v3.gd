@@ -1,4 +1,4 @@
-extends Node3D
+extends CharacterBody3D
 
 @export var move_speed: float = 1.0
 @export var turn_speed: float = 3.0
@@ -13,7 +13,7 @@ extends Node3D
 @export var pitch_sensitivity: float = 0.005
 # New exports for pitch compensation
 @export var pitch_compensation_factor: float = 0.5  # How much to lift/lower based on pitch
-@export var body_length: float = .3  # Approximate length of spider body
+@export var body_length: float = 1.0  # Approximate length of spider body
 
 @onready var fl_leg = $FrontLeftIKTarget
 @onready var fr_leg = $FrontRightIKTarget
@@ -32,11 +32,8 @@ var collision_states = {
 	"BackRightRay": false
 }
 
-# Ground detection ray
+# Ground detection
 signal grounded_state_changed(is_grounded: bool)
-@onready var ground_ray = $GroundRay
-var ground_ray_colliding: bool = false
-var vertical_velocity: float = 0.0
 var is_grounded: bool = true
 @export var fall_alignment_speed: float = 5.0
 
@@ -76,46 +73,45 @@ func _input(event):
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-func _process(delta):
-	# Reset to terrain basis before any calculations
-	transform.basis = terrain_basis
-	
-	# Handle user input
-	_handle_movement(delta)
+func _physics_process(delta):
+	# Handle user input first (rotation only)
+	_handle_rotation(delta)
 	
 	# Check if any leg is touching ground
 	_update_grounded_state()
 	
-	# Apply gravity if not grounded
-	if not is_grounded:
-		_apply_gravity(delta)
-	else:
-		vertical_velocity = 0.0
+	# Calculate movement velocity
+	var dir = Input.get_axis('ui_down', 'ui_up')
+	var forward = -transform.basis.z
+	velocity.x = forward.x * dir * move_speed
+	velocity.z = forward.z * dir * move_speed
 	
-	# Only do terrain alignment if grounded
-	if is_grounded == true:
+	# Apply gravity
+	if not is_grounded:
+		velocity.y -= gravity_strength * delta
+		velocity.y = max(velocity.y, -terminal_velocity)
+		_align_to_gravity(delta)
+	else:
+		# Small downward velocity to keep grounded
+		velocity.y = -0.5
 		_align_to_terrain(delta)
 	
-	# Apply visual pitch as the final step - but only if grounded
-	# When falling, the gravity alignment takes precedence
-	if is_grounded:
-		_apply_visual_pitch()
-
-func _handle_movement(delta):
-	# Forward/backward movement
-	var dir = Input.get_axis('ui_down', 'ui_up')
-	translate(Vector3(0, 0, -dir) * move_speed * delta)
+	# Move using CharacterBody3D's physics
+	move_and_slide()
 	
-	# Horizontal turning
+	# Apply visual pitch AFTER physics
+	_apply_visual_pitch()
+
+func _handle_rotation(delta):
+	# Horizontal turning only - no transform manipulation
 	var turn_amount = -mouse_delta_x * mouse_sensitivity
 	turn_amount = clamp(turn_amount, -max_turn_speed * delta, max_turn_speed * delta)
-	rotate_object_local(Vector3.UP, turn_amount)
+	rotate_y(turn_amount)  # Use rotate_y instead of rotate_object_local
 	
-	# Update terrain basis to include the rotation (only if grounded)
-	if is_grounded:
-		terrain_basis = transform.basis
+	# Update terrain basis to match current rotation
+	terrain_basis = transform.basis
 	
-	# Update pitch angle
+	# Update pitch angle (visual only)
 	var pitch_amount = -mouse_delta_y * pitch_sensitivity
 	current_pitch += pitch_amount
 	current_pitch = clamp(current_pitch, deg_to_rad(pitch_min), deg_to_rad(pitch_max))
@@ -125,48 +121,43 @@ func _handle_movement(delta):
 	mouse_delta_y = 0.0
 
 func _apply_visual_pitch():
-	# Use quaternion rotation to avoid gimbal lock
-	var pitch_quaternion = Quaternion(terrain_basis.x.normalized(), current_pitch)
-	transform.basis = Basis(pitch_quaternion) * terrain_basis
+	# Only apply pitch visually to child nodes, not the CharacterBody3D itself
+	# This prevents physics conflicts
+	if has_node("Armature"):
+		var armature = $Armature
+		var pitch_quaternion = Quaternion(Vector3.RIGHT, current_pitch)
+		armature.transform.basis = Basis(pitch_quaternion)
 
 func _align_to_terrain(delta):
+	if not is_grounded:
+		return
+		
 	# Use global positions for plane calculations
 	var plane1 = Plane(bl_leg.global_position, fl_leg.global_position, fr_leg.global_position)
 	var plane2 = Plane(fr_leg.global_position, br_leg.global_position, bl_leg.global_position)
 	var avg_normal = ((plane1.normal + plane2.normal) / 2).normalized()
 	
-	# Calculate target basis using the current terrain basis
-	var target_basis = _basis_from_normal_for_terrain(avg_normal, terrain_basis)
-	terrain_basis = lerp(terrain_basis, target_basis, (move_speed * 5) * delta).orthonormalized()
-	
-	# Apply the terrain basis (without pitch)
-	transform.basis = terrain_basis
-	
-	# Position adjustment with pitch compensation
-	var avg = (fl_leg.position + fr_leg.position + bl_leg.position + br_leg.position) / 4
-	var base_offset = ground_offset
-	
-	# Calculate additional height needed based on pitch
-	# When looking up (negative pitch), raise the spider
-	# When looking down (positive pitch), raise the spider
-	var pitch_height_offset = abs(sin(current_pitch)) * body_length * pitch_compensation_factor
-	
-	var total_offset = base_offset + pitch_height_offset
-	var target_pos = avg + transform.basis.y * total_offset
-	var distance = transform.basis.y.dot(target_pos - position)
-	position = lerp(position, position + transform.basis.y * distance, move_speed * delta)
+	# Only apply terrain alignment visually to child nodes
+	if has_node("Armature"):
+		var armature = $Armature
+		var target_basis = _basis_from_normal_for_terrain(avg_normal, terrain_basis)
+		
+		# Smooth transition
+		var current_basis = armature.transform.basis
+		armature.transform.basis = lerp(current_basis, target_basis, move_speed * 2 * delta).orthonormalized()
+		
+		# Apply pitch on top of terrain alignment
+		var pitch_quaternion = Quaternion(armature.transform.basis.x.normalized(), current_pitch)
+		armature.transform.basis = Basis(pitch_quaternion) * armature.transform.basis
 
 func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basis) -> Basis:
 	var result = Basis()
-	# Use the terrain basis forward direction, not the pitched transform
+	# Use the terrain basis forward direction
 	result.x = normal.cross(current_terrain_basis.z)
 	result.y = normal
 	result.z = result.x.cross(normal)
 	
 	result = result.orthonormalized()
-	result.x *= scale.x 
-	result.y *= scale.y 
-	result.z *= scale.z 
 	
 	return result
 	
@@ -177,42 +168,30 @@ func _update_grounded_state():
 		# When grounded, lose ground contact if NO legs are touching
 		is_grounded = collision_states.values().any(func(colliding): return colliding)
 	else:
-		# When airborne, only regain ground contact via ground ray
-		if ground_ray and ground_ray.is_colliding():
+		# When airborne, use is_on_floor() OR leg collision
+		if is_on_floor() or collision_states.values().any(func(colliding): return colliding):
 			is_grounded = true
-			# When regaining ground, update terrain basis to current orientation
-			terrain_basis = transform.basis
 			
 	# Emit signal if state changed
-	#if previous_grounded != is_grounded:
-	#	grounded_state_changed.emit(is_grounded)
+	if previous_grounded != is_grounded:
+		grounded_state_changed.emit(is_grounded)
 
-
-func _apply_gravity(delta):
-	# Increase downward velocity
-	vertical_velocity += gravity_strength * delta
-	# Clamp to terminal velocity
-	vertical_velocity = min(vertical_velocity, terminal_velocity)
-	
-	# Apply gravity in GLOBAL world down direction
-	global_position += Vector3.DOWN * vertical_velocity * delta
-	
-	# Align spider to fall "feet down"
-	_align_to_gravity(delta)
 func _align_to_gravity(delta):
-	# Get current forward direction (negative Z in local space)
+	# Only apply gravity alignment to visual components
+	if not has_node("Armature"):
+		return
+		
+	var armature = $Armature
 	var forward = -transform.basis.z
 	
-	# Create a new basis that's upright but maintains forward direction
+	# Create upright basis
 	var target_basis = Basis()
 	target_basis.y = Vector3.UP
-	# Remove any vertical component from forward direction
 	forward.y = 0
 	forward = forward.normalized()
 	
-	# If forward is too small (spider was facing straight up/down), use a default
 	if forward.length() < 0.1:
-		forward = -transform.basis.x  # Use right direction as fallback
+		forward = -transform.basis.x
 		forward.y = 0
 		forward = forward.normalized()
 	
@@ -220,30 +199,11 @@ func _align_to_gravity(delta):
 	target_basis.x = target_basis.y.cross(target_basis.z)
 	target_basis = target_basis.orthonormalized()
 	
-	# Apply scale
-	target_basis.x *= scale.x
-	target_basis.y *= scale.y
-	target_basis.z *= scale.z
-	
-	# Smoothly rotate towards upright orientation
-	terrain_basis = lerp(terrain_basis, target_basis, fall_alignment_speed * delta).orthonormalized()
-	transform.basis = terrain_basis
+	# Apply to armature only
+	armature.transform.basis = lerp(armature.transform.basis, target_basis, fall_alignment_speed * delta).orthonormalized()
 
 func _on_collision_changed(leg_name: String, is_colliding: bool):
 	collision_states[leg_name] = is_colliding
-
-func _basis_from_normal(normal: Vector3) -> Basis:
-	var result = Basis()
-	result.x = normal.cross(transform.basis.z)
-	result.y = normal
-	result.z = transform.basis.x.cross(normal)
-	
-	result = result.orthonormalized()
-	result.x *= scale.x 
-	result.y *= scale.y 
-	result.z *= scale.z 
-	
-	return result
 
 func _on_grounded_state_changed(grounded: bool):
 	# Notify all IK targets about grounding state

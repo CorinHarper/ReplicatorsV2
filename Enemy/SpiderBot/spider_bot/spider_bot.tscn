@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cabgrr2bvykhs"]
+[gd_scene load_steps=22 format=3 uid="uid://cabgrr2bvykhs"]
 
 [ext_resource type="Script" uid="uid://dkj7dvt1q82co" path="res://Enemy/SpiderBot/spider_bot/start_ik.gd" id="1_n6l5c"]
 [ext_resource type="PackedScene" uid="uid://b1n5rqw53onuo" path="res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf" id="1_vovvw"]
@@ -7,8 +7,122 @@
 [ext_resource type="Script" uid="uid://cjolrusr43m3e" path="res://Enemy/SpiderBot/spider_bot/ik_target.gd" id="4_p25cf"]
 [ext_resource type="Script" uid="uid://bjm4aeaua26ug" path="res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd" id="5_yguvh"]
 
+[sub_resource type="Animation" id="Animation_gmc3e"]
+length = 0.001
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 2
+tracks/0/loop_wrap = false
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0)
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:move_speed")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [2.0]
+}
+
+[sub_resource type="Animation" id="Animation_815yx"]
+resource_name = "idle"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0.5, 1, 0, -0.01, 0, 1.5, 1, 0, 0.01, 0)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Armature")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, -0.013, 0, 0, 1, 0.966667, 1, 0.013, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_k1hnp"]
+resource_name = "jump"
+length = 2.0
+tracks/0/type = "rotation_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 2
+tracks/0/loop_wrap = false
+tracks/0/keys = PackedFloat32Array(0.3, 1, 0, 0, 0, 1, 0.733333, 1, 0.174, 0, 0, 0.985, 1.23333, 1, 0.342, 0, 0, 0.94, 1.43333, 1, 0.5, 0, 0, 0.866, 2.06667, 1, 0, 0, 0, 1)
+tracks/1/type = "position_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Armature")
+tracks/1/interp = 2
+tracks/1/loop_wrap = false
+tracks/1/keys = PackedFloat32Array(0.3, 1, 0, 0, 0, 0.733333, 1, 0, 0.07, -0.2, 1.23333, 1, 0, -0.07, 0.3, 1.43333, 1, 0, 0.155, -0.4, 1.8, 1, 0, -0.07, 0, 2.06667, 1, 0, -0.07, 0)
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:move_speed")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.733333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [2.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_gltnb"]
+resource_name = "mid_air"
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, -0.155, 0)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_815yx"]
+_data = {
+&"RESET": SubResource("Animation_gmc3e"),
+&"idle": SubResource("Animation_815yx"),
+&"jump": SubResource("Animation_k1hnp"),
+&"mid_air": SubResource("Animation_gltnb")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gmc3e"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_k1hnp"]
+animation = &"jump"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_815yx"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_gltnb"]
+advance_mode = 2
+advance_expression = "owner.is_jumping == true"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_y430h"]
+xfade_time = 0.3
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_pik5h"]
+states/idle/node = SubResource("AnimationNodeAnimation_gmc3e")
+states/idle/position = Vector2(495, 149.5)
+states/jump/node = SubResource("AnimationNodeAnimation_k1hnp")
+states/jump/position = Vector2(496.5, 328)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_815yx"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_gltnb"), "jump", "idle", SubResource("AnimationNodeStateMachineTransition_y430h")]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_gmc3e"]
-size = Vector3(0.3, 0.1, 0.3)
+size = Vector3(0.3, 0.162793, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwxtc"]
 albedo_color = Color(0.396078, 0.396078, 0.396078, 1)
@@ -23,19 +137,32 @@ emission_energy_multiplier = 5.14
 albedo_color = Color(0.52549, 0.52549, 0.52549, 1)
 
 [node name="SpiderBot" instance=ExtResource("1_vovvw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155261, 0)
+transform = Transform3D(1, 0, 0, 0, 0.999838, 0.0179985, 0, -0.0179985, 0.999838, 0, 0.1555, 0)
 script = ExtResource("2_kfpvc")
 move_speed = 2.0
+ground_offset = 0.1
+body_length = 0.5
+jump_strength = 1.0
 fall_alignment_speed = 10.0
 
-[node name="StaticBody3D" type="StaticBody3D" parent="." index="0"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="0"]
+libraries = {
+&"": SubResource("AnimationLibrary_815yx")
+}
+playback_default_blend_time = 1.0
+
+[node name="AnimationTree" type="AnimationTree" parent="." index="1"]
+tree_root = SubResource("AnimationNodeStateMachine_pik5h")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." index="2"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0374492, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0688457, 0)
 shape = SubResource("BoxShape3D_gmc3e")
 
-[node name="Armature" parent="." index="1"]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, 0)
+[node name="Armature" parent="." index="3"]
+transform = Transform3D(0.3, 0, 0, 0, 0.149993, -0.259811, 0, 0.259811, 0.149993, 0, 0, 0)
 
 [node name="Body_2" parent="Armature/Skeleton3D" index="0"]
 transform = Transform3D(0.325856, 0, 0, 0, 0.325856, 0, 0, 0, 0.325856, 0, 0, 0)
@@ -98,7 +225,7 @@ magnet = Vector3(0, 10, 0)
 target_node = NodePath("../../../BackRightIKTarget")
 script = ExtResource("1_n6l5c")
 
-[node name="StepTargetContainer" type="Node3D" parent="." index="2"]
+[node name="StepTargetContainer" type="Node3D" parent="." index="4"]
 script = ExtResource("5_yguvh")
 offset = 3.0
 
@@ -124,7 +251,7 @@ transform = Transform3D(0.985133, 0.171244, 0.0137501, -0.17101, 0.969846, 0.173
 
 [node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, -0.25, 0.5, 0.25)
+transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, -0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackLeftStepTarget")
@@ -134,7 +261,7 @@ transform = Transform3D(0.985133, -0.171244, 0.0137501, 0.17101, 0.969848, -0.17
 
 [node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, 0.25, 0.5, 0.25)
+transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, 0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
 script = ExtResource("4_8a6ki")
 step_target = NodePath("BackRightStepTarget")
@@ -142,7 +269,7 @@ step_target = NodePath("BackRightStepTarget")
 [node name="BackRightStepTarget" type="Marker3D" parent="StepTargetContainer/BackRightRay" index="0"]
 transform = Transform3D(1, -0.00015196, 0.00173207, 0.000152314, 1, -0.000151351, -0.00173205, 0.000151768, 0.999999, 0, -0.634657, 0)
 
-[node name="FrontLeftIKTarget" type="Marker3D" parent="." index="3" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="FrontLeftIKTarget" type="Marker3D" parent="." index="5" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0, -0.25)
 top_level = true
@@ -152,7 +279,7 @@ adjacent_target = NodePath("../FrontRightIKTarget")
 opposite_target = NodePath("../BackRightIKTarget")
 retract_speed = 0.12
 
-[node name="FrontRightIKTarget" type="Marker3D" parent="." index="4" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="FrontRightIKTarget" type="Marker3D" parent="." index="6" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0, -0.25)
 top_level = true
@@ -162,7 +289,7 @@ adjacent_target = NodePath("../FrontLeftIKTarget")
 opposite_target = NodePath("../BackLeftIKTarget")
 retract_speed = 0.12
 
-[node name="BackLeftIKTarget" type="Marker3D" parent="." index="5" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="BackLeftIKTarget" type="Marker3D" parent="." index="7" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0, 0.25)
 top_level = true
@@ -172,7 +299,7 @@ adjacent_target = NodePath("../BackRightIKTarget")
 opposite_target = NodePath("../FrontRightIKTarget")
 retract_speed = 0.12
 
-[node name="BackRightIKTarget" type="Marker3D" parent="." index="6" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="BackRightIKTarget" type="Marker3D" parent="." index="8" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0, 0.25)
 top_level = true
@@ -180,7 +307,9 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget")
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
-retract_speed = 0.12
+retract_speed = 0.11
 
-[node name="GroundRay" type="RayCast3D" parent="." index="7"]
-target_position = Vector3(0, -0.1, 0)
+[node name="GroundRay" type="RayCast3D" parent="." index="9"]
+target_position = Vector3(0, -0.2, 0)
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

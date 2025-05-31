@@ -25,6 +25,14 @@ extends Node3D
 @onready var bl_ray = $StepTargetContainer/BackLeftRay
 @onready var br_ray = $StepTargetContainer/BackRightRay
 
+# Jump variables
+@export var jump_strength: float = 5.0
+var can_jump: bool = true
+var is_jumping: bool = false
+
+# Add AnimationPlayer reference with other @onready vars
+@onready var animation_player = $AnimationPlayer
+
 var collision_states = {
 	"FrontLeftRay": false,
 	"FrontRightRay": false,
@@ -67,6 +75,11 @@ func _ready():
 	grounded_state_changed.connect(_on_grounded_state_changed)
 	
 func _input(event):
+		# Add this to the existing _input function
+	if event.is_action_pressed("jump") and can_jump and is_grounded:
+		# need to implement something that starts jumping 
+		pass
+		
 	if event is InputEventMouseMotion:
 		mouse_delta_x = event.relative.x
 		mouse_delta_y = event.relative.y

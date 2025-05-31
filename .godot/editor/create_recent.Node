@@ -1,3 +1,5 @@
+AnimationTree
+AnimationPlayer
 CollisionShape3D
 CharacterBody3D
 Node3D
@@ -10,5 +12,3 @@ NavigationLink3D
 NavigationRegion3D
 CSGBox3D
 CSGMesh3D
-CSGCombiner3D
-CSGCylinder3D

@@ -10,3 +10,4 @@ res://TestLevel.tscn
 res://Enemy/SpiderBot/spider_bot/spider_bot.tscn
 res://Enemy/SpiderBot/spider_bot/step_ray.gd
 res://Enemy/SpiderBot/spider_bot/spider_bot.gd
+res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd

@@ -149,7 +149,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontLeftRay/FrontLeftStepTarget")
 adjacent_target = NodePath("../FrontRightIKTarget")
 opposite_target = NodePath("../BackRightIKTarget")
-retract_speed = 1000.0
+retract_speed = 0.025
 
 [node name="FrontRightIKTarget" type="Marker3D" parent="." index="4" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
@@ -159,6 +159,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontRightRay/FrontRightStepTarget")
 adjacent_target = NodePath("../FrontLeftIKTarget")
 opposite_target = NodePath("../BackLeftIKTarget")
+retract_speed = 0.025
 
 [node name="BackLeftIKTarget" type="Marker3D" parent="." index="5" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
@@ -168,6 +169,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackLeftRay/BackLeftStepTarget")
 adjacent_target = NodePath("../BackRightIKTarget")
 opposite_target = NodePath("../FrontRightIKTarget")
+retract_speed = 0.025
 
 [node name="BackRightIKTarget" type="Marker3D" parent="." index="6" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
@@ -177,7 +179,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget")
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
-retract_speed = 0.0
+retract_speed = 0.025
 
 [node name="GroundRay" type="RayCast3D" parent="." index="7"]
-target_position = Vector3(0, -0.3, 0)
+target_position = Vector3(0, -0.2, 0)

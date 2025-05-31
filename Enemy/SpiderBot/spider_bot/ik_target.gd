@@ -16,7 +16,7 @@ var default_offset: Vector3
 func _ready():
 	# Since this node has top_level = true, we need to store its position relative to the spider
 	if owner:
-		default_offset = owner.to_local(global_position)
+		default_offset = owner.to_global(global_position)
 
 func _process(delta):
 	if is_grounded:
@@ -26,10 +26,9 @@ func _process(delta):
 			opposite_target.step()
 	else:
 		# When falling, move to default position relative to spider
-		# Since we're top_level, we need to calculate the global position
-
-		var target_pos = owner.to_local(default_offset)
-		global_position = lerp(global_position, target_pos, retract_speed)
+		# default_offset is already in local space, convert it to global
+		var target_pos = owner.to_global(default_offset)
+		global_position = lerp(global_position, target_pos, retract_speed * delta)
 		
 		# Move step target to match
 		if step_target:
@@ -45,9 +44,11 @@ func step():
 	t.tween_property(self, "global_position", target_pos, step_speed)
 	t.tween_callback(func(): is_stepping = false)
 
+
 func set_grounded(grounded: bool):
+	print("IK Target ", name, " grounded state changed to: ", grounded)
 	is_grounded = grounded
 	# Kill any active tweens when falling
 	if not grounded:
 		is_stepping = false
-		get_tree().create_tween().kill()  # Kill any active tween
+		get_tree().create_tween().kill()

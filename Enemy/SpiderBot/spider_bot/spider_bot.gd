@@ -184,8 +184,8 @@ func _update_grounded_state():
 			terrain_basis = transform.basis
 			
 	# Emit signal if state changed
-	#if previous_grounded != is_grounded:
-	#	grounded_state_changed.emit(is_grounded)
+	if previous_grounded != is_grounded:
+		grounded_state_changed.emit(is_grounded)
 
 
 func _apply_gravity(delta):
@@ -246,6 +246,9 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
+	
+	if is_grounded == true: 
+		print("break")
 	# Notify all IK targets about grounding state
 	if fl_leg:
 		fl_leg.set_grounded(grounded)
@@ -265,7 +268,8 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
-
+	print("HERE")
+	
 # Getter for current pitch - used by StepTargetContainer
 func _get_current_pitch() -> float:
 	return current_pitch

@@ -1,5 +1,6 @@
 extends Node3D
-
+@export var is_grouned = false
+@export var strafe_speed: float = .5
 @export var move_speed: float = 1.0
 @export var turn_speed: float = 3.0
 @export var ground_offset: float = 0.15
@@ -26,12 +27,14 @@ extends Node3D
 @onready var br_ray = $StepTargetContainer/BackRightRay
 
 # Jump variables
-@export var jump_strength: float = 5.0
+@export var jump_strength: float = 1.0
+var jump_pressed: bool = false
 var can_jump: bool = true
-var is_jumping: bool = false
+@export var is_jumping: bool = false
 
 # Add AnimationPlayer reference with other @onready vars
-@onready var animation_player = $AnimationPlayer
+@onready var state_machine = $AnimationTree["parameters/playback"]
+
 
 var collision_states = {
 	"FrontLeftRay": false,
@@ -77,8 +80,8 @@ func _ready():
 func _input(event):
 		# Add this to the existing _input function
 	if event.is_action_pressed("jump") and can_jump and is_grounded:
-		# need to implement something that starts jumping 
-		pass
+		state_machine.travel("fall")
+	
 		
 	if event is InputEventMouseMotion:
 		mouse_delta_x = event.relative.x
@@ -119,6 +122,10 @@ func _handle_movement(delta):
 	# Forward/backward movement
 	var dir = Input.get_axis('ui_down', 'ui_up')
 	translate(Vector3(0, 0, -dir) * move_speed * delta)
+	
+	var strafe = Input.get_axis('ui_left', 'ui_right')
+	translate(Vector3(strafe, 0, 0) * strafe_speed * delta)
+	
 	
 	# Horizontal turning
 	var turn_amount = -mouse_delta_x * mouse_sensitivity
@@ -190,12 +197,19 @@ func _update_grounded_state():
 	if is_grounded:
 		# When grounded, lose ground contact if NO legs are touching
 		is_grounded = collision_states.values().any(func(colliding): return colliding)
+		can_jump = true
+		is_jumping = false
 	else:
 		# When airborne, only regain ground contact via ground ray
 		if ground_ray and ground_ray.is_colliding():
 			is_grounded = true
+			can_jump = true
+			is_jumping = false
 			# When regaining ground, update terrain basis to current orientation
 			terrain_basis = transform.basis
+		else:
+			is_jumping = true
+			can_jump = false
 			
 	# Emit signal if state changed
 	if previous_grounded != is_grounded:
@@ -213,6 +227,8 @@ func _apply_gravity(delta):
 	
 	# Align spider to fall "feet down"
 	_align_to_gravity(delta)
+	
+	
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
 	var forward = -transform.basis.z
@@ -260,9 +276,7 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
-	
-	if is_grounded == true: 
-		print("break")
+
 	# Notify all IK targets about grounding state
 	if fl_leg:
 		fl_leg.set_grounded(grounded)
@@ -282,6 +296,7 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
+	
 
 	
 # Getter for current pitch - used by StepTargetContainer
@@ -291,3 +306,18 @@ func _get_current_pitch() -> float:
 # Getter for terrain basis - used by StepTargetContainer
 func _get_terrain_basis() -> Basis:
 	return terrain_basis
+
+
+
+func _jump():
+	if is_jumping == true and can_jump == true:
+		# Apply upward velocity - needs to be much stronger than gravity!
+		vertical_velocity = -jump_strength  # Try jump_strength = 10.0 or higher
+		
+
+		can_jump = false
+		
+		# FORCE the spider to be ungrounded immediately
+		is_grounded = false
+		grounded_state_changed.emit(false)
+		

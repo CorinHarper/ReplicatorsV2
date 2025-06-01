@@ -29,10 +29,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
 environment = SubResource("Environment_y1jsw")
 
 [node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2782, 8.815, 3.8752)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2782, 3.51154, 3.8752)
 fall_alignment_speed = 5.0
 
 [node name="Camera3D" type="Camera3D" parent="SpiderBot"]
-transform = Transform3D(0.999998, -0.000988523, -0.00145019, 0.00169974, 0.751317, 0.659939, 0.000437192, -0.65994, 0.751318, 0.0014197, 0.53678, 0.510264)
+transform = Transform3D(0.999999, -0.000988525, -0.0014502, 0.00169974, 0.751317, 0.659939, 0.000437192, -0.65994, 0.751318, 0.00141999, 0.812425, 0.938051)
 current = true
 fov = 80.0

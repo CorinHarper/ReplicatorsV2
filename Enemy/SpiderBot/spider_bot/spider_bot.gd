@@ -48,7 +48,7 @@ var jump_pressed: bool = false
 
 @onready var horizontal_movement_handler = $HorizontalMovementHandler
 @onready var movement_input_handler = $MovementInputHandler
-@onready var alignment_ray_manager = %AlignmentRayManager  # NEW
+@onready var alignment_ray_manager = $AlignmentRayManager  # NEW
 
 
 

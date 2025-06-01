@@ -10,3 +10,4 @@ res://Enemy/SpiderBot/spider_bot/ik_target.gd
 res://Enemy/SpiderBot/spider_bot/alignment_ray_manager.gd
 res://Enemy/SpiderBot/spider_bot/spider_bot.gd
 res://Enemy/SpiderBot/spider_bot/ground_detection.gd
+res://Enemy/SpiderBot/spider_bot/spider_debug_helper.gd

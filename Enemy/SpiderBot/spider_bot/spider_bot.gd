@@ -24,13 +24,10 @@ extends Node3D
 @export var ground_offset: float = 0.15
 @export var body_length: float = .3
 @export var pitch_compensation_factor: float = 0.5
-@export var fall_alignment_speed: float = 5.0
 
-# Physics Settings
-@export_group("Physics")
-@export var gravity_strength: float = 9.8
-@export var terminal_velocity: float = 100.0
-@export var jump_strength: float = 1.0
+
+@onready var gravity_handler = $GravityHandler
+@export var jump_strength: float = 1.0  # Keep this here for now
 
 # Movement input values from handler
 var input_move_dir: float = 0.0
@@ -63,20 +60,24 @@ var current_pitch: float = 0.0
 # Store the terrain-aligned basis separately
 var terrain_basis: Basis
 
-
-func _ready():
-	Engine.time_scale = 1.0
-	# Initialize terrain basis
-	terrain_basis = transform.basis
-
-		# Set up ground detection through the ground ray
+func _setup_ground_detection():
+	# Set up ground detection through the ground ray
 	if ground_ray and ground_ray.has_method("setup_leg_rays"):
 		ground_ray.setup_leg_rays($StepTargetContainer)
 		ground_ray.grounded_state_changed.connect(_on_grounded_state_changed)
-	# Connect to movement input handler signals
 
+func _setup_movement_input():
+	# Connect to movement input handler signals
 	movement_input_handler.movement_input.connect(_on_movement_input)
 	movement_input_handler.jump_requested.connect(_on_jump_requested)
+	
+func _ready():
+	# Initialize terrain basis
+	terrain_basis = transform.basis
+	# setup dependencies (connect signals, initialize stuff etc.) 
+	_setup_ground_detection()
+	_setup_movement_input()
+	
 		
 func _on_movement_input(movement_vector: Vector3,turn_amount: float, pitch: float):
 	current_pitch = pitch
@@ -103,12 +104,14 @@ func _process(delta):
 	# Keep local grounded state synced with ground ray
 	if ground_ray and ground_ray.has_method("get_grounded_state"):
 		is_grounded = ground_ray.get_grounded_state()
-	
 	# Apply gravity if not grounded
 	if not is_grounded:
 		_apply_gravity(delta)
 	else:
-		vertical_velocity = 0.0
+		gravity_handler.reset_velocity()
+
+	# Update gravity handler state
+	gravity_handler.set_active(not is_grounded)
 	
 	# Only do terrain alignment if grounded
 	if is_grounded == true:
@@ -180,19 +183,16 @@ func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basi
 	
 	return result
 	
-
 func _apply_gravity(delta):
-	# Increase downward velocity
-	vertical_velocity += gravity_strength * delta
-	# Clamp to terminal velocity
-	vertical_velocity = min(vertical_velocity, terminal_velocity)
+	# Get physics displacement from handler
+	var physics_displacement = gravity_handler.apply_physics(delta, transform)
+	global_position += physics_displacement
 	
-	# Apply gravity in GLOBAL world down direction
-	global_position += Vector3.DOWN * vertical_velocity * delta
-	
-	# Align spider to fall "feet down"
-	_align_to_gravity(delta)
-	
+	# Align spider to fall "feet down" if needed
+	if gravity_handler.should_align_to_gravity():
+		_align_to_gravity(delta)
+		
+		
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
 	var forward = -transform.basis.z
@@ -219,8 +219,8 @@ func _align_to_gravity(delta):
 	target_basis.y *= scale.y
 	target_basis.z *= scale.z
 	
-	# Smoothly rotate towards upright orientation
-	terrain_basis = lerp(terrain_basis, target_basis, fall_alignment_speed * delta).orthonormalized()
+	# Smoothly rotate towards upright orientation - now using gravity_handler's speed
+	terrain_basis = lerp(terrain_basis, target_basis, gravity_handler.fall_alignment_speed * delta).orthonormalized()
 	transform.basis = terrain_basis
 
 
@@ -275,7 +275,8 @@ func _get_terrain_basis() -> Basis:
 	
 func _jump():
 	if is_jumping == true and can_jump == true:
-		vertical_velocity = -jump_strength
+		# Jump in the spider's current up direction
+		gravity_handler.add_jump_impulse(jump_strength, transform.basis.y)
 		can_jump = false
 		
 		# Force ungrounded through the ground ray

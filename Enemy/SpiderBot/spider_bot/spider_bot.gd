@@ -3,6 +3,7 @@ extends Node3D
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @export var is_falling_state:bool = false
 
+
 @onready var fl_leg = $FrontLeftIKTarget
 @onready var fr_leg = $FrontRightIKTarget
 @onready var bl_leg = $BackLeftIKTarget
@@ -43,7 +44,7 @@ var jump_pressed: bool = false
 @export var is_jumping: bool = false	# only exported for animation PLAYER access
 
 
-
+@onready var horizontal_movement_handler = $HorizontalMovementHandler
 @onready var movement_input_handler = $MovementInputHandler
 
 
@@ -73,6 +74,7 @@ func _setup_movement_input():
 	movement_input_handler.jump_requested.connect(_on_jump_requested)
 	
 func _ready():
+	
 	# Initialize terrain basis
 	terrain_basis = transform.basis
 	# setup dependencies (connect signals, initialize stuff etc.) 
@@ -90,7 +92,7 @@ func _on_jump_requested():
 	if can_jump and is_grounded:
 		state_machine.travel("crouch")
 		
-		
+
 func _process(delta):
 	# Update pitch from input handler
 	if movement_input_handler:
@@ -122,21 +124,25 @@ func _process(delta):
 	# When falling, the gravity alignment takes precedence
 	if is_grounded:
 		_apply_visual_pitch()
-
+		
 func _handle_movement(delta):
-	# Apply movement
-	translate(Vector3(0, 0, -input_move_dir) * move_speed * delta)
-	translate(Vector3(input_strafe_dir, 0, 0) * strafe_speed * delta)
+	# Get movement displacement from handler
+	if horizontal_movement_handler:
+		var displacement = horizontal_movement_handler.apply_movement(
+			delta, 
+			input_move_dir, 
+			input_strafe_dir,
+			terrain_basis  # Use terrain_basis, not transform.basis
+		)
+		global_position += displacement
 	
 	# Apply rotation
 	var turn_amount = clamp(input_turn_amount, -max_turn_speed * delta, max_turn_speed * delta)
 	rotate_object_local(Vector3.UP, turn_amount)
 	
-	# Update terrain basis to include the rotation (only if grounded)
-	if is_grounded and is_jumping :
+	# Update terrain basis to include the rotation when grounded
+	if is_grounded:  # Remove the "and is_jumping" check - that was wrong
 		terrain_basis = transform.basis
-		
-		
 
 func _apply_visual_pitch():
 	# Use quaternion rotation to avoid gimbal lock
@@ -192,7 +198,6 @@ func _apply_gravity(delta):
 	# Align spider to fall "feet down" if needed
 	if gravity_handler.should_align_to_gravity():
 		_align_to_gravity(delta)
-		
 		
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
@@ -266,7 +271,12 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
-
+	
+		# When falling, you might want to reduce horizontal control
+	if horizontal_movement_handler:
+		horizontal_movement_handler.set_active(grounded)
+		
+		
 # Getter for current pitch - used by StepTargetContainer
 func _get_current_pitch() -> float:
 	return current_pitch

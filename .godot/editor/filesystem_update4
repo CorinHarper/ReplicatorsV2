@@ -12,3 +12,4 @@ res://Enemy/SpiderBot/spider_bot/movement_handler.gd
 res://Enemy/SpiderBot/spider_bot/ground_detection.gd
 res://Enemy/SpiderBot/spider_bot/gravity_handler.gd
 res://Curves/basic_power_curve.tres
+res://Enemy/SpiderBot/spider_bot/horizontal_movement_handler.gd

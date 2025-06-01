@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cabgrr2bvykhs"]
+[gd_scene load_steps=38 format=3 uid="uid://cabgrr2bvykhs"]
 
 [ext_resource type="Script" uid="uid://dkj7dvt1q82co" path="res://Enemy/SpiderBot/spider_bot/start_ik.gd" id="1_n6l5c"]
 [ext_resource type="PackedScene" uid="uid://b1n5rqw53onuo" path="res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf" id="1_vovvw"]
@@ -247,6 +247,8 @@ _data = {
 &"land": SubResource("Animation_pik5h")
 }
 
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_y430h"]
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gltnb"]
 animation = &"crouch"
 
@@ -293,7 +295,12 @@ xfade_time = 0.3
 advance_mode = 2
 advance_expression = "is_falling_state == true"
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_pik5h"]
+advance_mode = 2
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_pik5h"]
+states/BlendSpace2D/node = SubResource("AnimationNodeBlendSpace2D_y430h")
+states/BlendSpace2D/position = Vector2(230.5, 229.298)
 states/Start/position = Vector2(212.5, 105.5)
 states/crouch/node = SubResource("AnimationNodeAnimation_gltnb")
 states/crouch/position = Vector2(736.5, 193.213)
@@ -305,8 +312,8 @@ states/jump/node = SubResource("AnimationNodeAnimation_pik5h")
 states/jump/position = Vector2(943.5, 305.713)
 states/land/node = SubResource("AnimationNodeAnimation_per0y")
 states/land/position = Vector2(679.875, 343.213)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_6jwsp"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_5uion"), "idle", "crouch", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "crouch", "jump", SubResource("AnimationNodeStateMachineTransition_pa55s"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_irdsp"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_cilhs")]
-graph_offset = Vector2(0, 277.14)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_6jwsp"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_5uion"), "idle", "crouch", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "crouch", "jump", SubResource("AnimationNodeStateMachineTransition_pa55s"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_irdsp"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_cilhs"), "Start", "BlendSpace2D", SubResource("AnimationNodeStateMachineTransition_pik5h")]
+graph_offset = Vector2(0, 17.2985)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gmc3e"]
 size = Vector3(0.3, 0.162793, 0.3)
@@ -324,11 +331,12 @@ emission_energy_multiplier = 5.14
 albedo_color = Color(0.52549, 0.52549, 0.52549, 1)
 
 [node name="SpiderBot" instance=ExtResource("1_vovvw")]
-transform = Transform3D(1, 0, 0, 0, 0.999838, 0.0179985, 0, -0.0179985, 0.999838, 0, 0.1555, 0)
+transform = Transform3D(1, 0, 0, 0, 0.999917, -0.0128576, 0, 0.0128576, 0.999917, 0, 0.1555, 0)
 script = ExtResource("2_kfpvc")
 move_speed = 2.0
-ground_offset = 0.1
+ground_offset = 0.12
 body_length = 0.5
+pitch_compensation_factor = 0.35
 jump_strength = 5.0
 
 [node name="HorizontalMovementHandler" type="Node" parent="." index="0"]
@@ -354,6 +362,7 @@ tree_root = SubResource("AnimationNodeStateMachine_pik5h")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/conditions/is_falling_state = false
+parameters/BlendSpace2D/blend_position = Vector2(0.00267375, 0.00346017)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." index="5"]
 
@@ -362,7 +371,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0688457, 0)
 shape = SubResource("BoxShape3D_gmc3e")
 
 [node name="Armature" parent="." index="6"]
-transform = Transform3D(0.3, 0, 0, 0, 0.2999, 0.00772131, 0, -0.00772131, 0.2999, 0, 0, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.299961, -0.00478323, 0, 0.00478323, 0.299961, 0, 0, 0)
 
 [node name="Body_2" parent="Armature/Skeleton3D" index="0"]
 transform = Transform3D(0.325856, 0, 0, 0, 0.325856, 0, 0, 0, 0.325856, 0, 0, 0)
@@ -425,15 +434,17 @@ magnet = Vector3(0, 10, 0)
 target_node = NodePath("../../../BackRightIKTarget")
 script = ExtResource("1_n6l5c")
 
-[node name="StepTargetContainer" type="Node3D" parent="." index="7"]
-script = ExtResource("5_yguvh")
-offset = 3.0
-
-[node name="GroundRay" type="RayCast3D" parent="StepTargetContainer" index="0"]
+[node name="GroundRay" type="RayCast3D" parent="." index="7"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 9.31323e-10, 0, -9.31323e-10, 1, 0, 0, 0)
 target_position = Vector3(0, -0.2, 0)
 script = ExtResource("7_gltnb")
 
-[node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
+[node name="StepTargetContainer" type="Node3D" parent="." index="8"]
+script = ExtResource("5_yguvh")
+offset = 20.0
+
+[node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="0" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, -0.25, 0.5, -0.25)
 target_position = Vector3(0, -1.5, 0)
@@ -443,7 +454,7 @@ step_target = NodePath("FrontLeftStepTarget")
 [node name="FrontLeftStepTarget" type="Marker3D" parent="StepTargetContainer/FrontLeftRay" index="0"]
 transform = Transform3D(0.999903, 1.4028e-08, -0.0139622, -1.31666e-07, 1, -5.21541e-08, 0.0139622, 0, 0.999903, 0, -0.634657, 0)
 
-[node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
+[node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, 0.25, 0.5, -0.25)
 target_position = Vector3(0, -1.5, 0)
@@ -453,7 +464,7 @@ step_target = NodePath("FrontRightStepTarget")
 [node name="FrontRightStepTarget" type="Marker3D" parent="StepTargetContainer/FrontRightRay" index="0"]
 transform = Transform3D(0.985133, 0.171244, 0.0137501, -0.17101, 0.969846, 0.173648, 0.0164007, -0.173418, 0.984713, 0, -0.634657, 0)
 
-[node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
+[node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, -0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
@@ -463,7 +474,7 @@ step_target = NodePath("BackLeftStepTarget")
 [node name="BackLeftStepTarget" type="Marker3D" parent="StepTargetContainer/BackLeftRay" index="0"]
 transform = Transform3D(0.985133, -0.171244, 0.0137501, 0.17101, 0.969848, -0.173648, 0.0164007, 0.173418, 0.984713, 0, -0.634656, 0)
 
-[node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="4" node_paths=PackedStringArray("step_target")]
+[node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, 0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
@@ -473,7 +484,7 @@ step_target = NodePath("BackRightStepTarget")
 [node name="BackRightStepTarget" type="Marker3D" parent="StepTargetContainer/BackRightRay" index="0"]
 transform = Transform3D(1, -0.00015196, 0.00173207, 0.000152314, 1, -0.000151351, -0.00173205, 0.000151768, 0.999999, 0, -0.634657, 0)
 
-[node name="FrontLeftIKTarget" type="Marker3D" parent="." index="8" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="FrontLeftIKTarget" type="Marker3D" parent="." index="9" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0, -0.25)
 top_level = true
@@ -481,9 +492,9 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontLeftRay/FrontLeftStepTarget")
 adjacent_target = NodePath("../FrontRightIKTarget")
 opposite_target = NodePath("../BackRightIKTarget")
-retract_speed = 0.25
+retract_speed = 0.2
 
-[node name="FrontRightIKTarget" type="Marker3D" parent="." index="9" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="FrontRightIKTarget" type="Marker3D" parent="." index="10" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0, -0.25)
 top_level = true
@@ -491,9 +502,9 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontRightRay/FrontRightStepTarget")
 adjacent_target = NodePath("../FrontLeftIKTarget")
 opposite_target = NodePath("../BackLeftIKTarget")
-retract_speed = 0.12
+retract_speed = 0.2
 
-[node name="BackLeftIKTarget" type="Marker3D" parent="." index="10" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="BackLeftIKTarget" type="Marker3D" parent="." index="11" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0, 0.25)
 top_level = true
@@ -501,9 +512,9 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackLeftRay/BackLeftStepTarget")
 adjacent_target = NodePath("../BackRightIKTarget")
 opposite_target = NodePath("../FrontRightIKTarget")
-retract_speed = 0.12
+retract_speed = 0.2
 
-[node name="BackRightIKTarget" type="Marker3D" parent="." index="11" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
+[node name="BackRightIKTarget" type="Marker3D" parent="." index="12" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0, 0.25)
 top_level = true
@@ -511,6 +522,6 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget")
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
-retract_speed = 0.11
+retract_speed = 0.2
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

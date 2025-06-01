@@ -50,7 +50,7 @@ var jump_pressed: bool = false
 
 
 # Ground detection ray
-@onready var ground_ray: RayCast3D = $StepTargetContainer/GroundRay
+@onready var ground_ray: RayCast3D = %GroundRay
 var vertical_velocity: float = 0.0
 @export var is_grounded: bool = true		# only exported for animation tree access 
 
@@ -245,7 +245,6 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
-
 	# When regaining ground from airborne, update terrain basis
 	if grounded and not is_grounded:
 		terrain_basis = transform.basis
@@ -272,9 +271,9 @@ func _on_grounded_state_changed(grounded: bool):
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
 	
-		# When falling, you might want to reduce horizontal control
+	# Update horizontal movement handler's grounded state
 	if horizontal_movement_handler:
-		horizontal_movement_handler.set_active(grounded)
+		horizontal_movement_handler.set_grounded(grounded)
 		
 		
 # Getter for current pitch - used by StepTargetContainer

@@ -12,7 +12,7 @@ signal velocity_changed(velocity: Vector3)
 var velocity: Vector3 = Vector3.ZERO  # Local velocity (x=strafe, z=forward)
 var is_active: bool = true
 
-@export var air_control_factor: float = 0.4  # How much control you have in the air (0-1)
+@export var air_control_factor: float = 0.3  # How much control you have in the air (0-1)
 
 var is_grounded: bool = true  # Track grounded state separately from active
 

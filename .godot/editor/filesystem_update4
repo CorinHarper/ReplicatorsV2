@@ -6,10 +6,7 @@ res://Maps/DevMap/plane_navMesh.tscn
 res://Maps/DevMap/greybox_bridge.tscn
 res://Maps/DevMap/greyboxing.tscn
 res://Enemy/SpiderBot/spider_bot/spider_bot.tscn
-res://TestLevel.tscn
+res://Enemy/SpiderBot/spider_bot/ik_target.gd
+res://Enemy/SpiderBot/spider_bot/alignment_ray_manager.gd
 res://Enemy/SpiderBot/spider_bot/spider_bot.gd
-res://Enemy/SpiderBot/spider_bot/movement_handler.gd
 res://Enemy/SpiderBot/spider_bot/ground_detection.gd
-res://Enemy/SpiderBot/spider_bot/gravity_handler.gd
-res://Curves/basic_power_curve.tres
-res://Enemy/SpiderBot/spider_bot/horizontal_movement_handler.gd

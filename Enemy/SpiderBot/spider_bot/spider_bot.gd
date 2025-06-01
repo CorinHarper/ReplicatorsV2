@@ -26,6 +26,8 @@ extends Node3D
 @export var ground_offset: float = 0.15
 @export var body_length: float = .3
 @export var pitch_compensation_factor: float = 0.5
+@export var use_alignment_rays: bool = true  # Toggle for new alignment system
+@export var airborne_alignment_speed: float = 3.0  # How fast to align when airborne
 
 
 @onready var gravity_handler = $GravityHandler
@@ -46,6 +48,7 @@ var jump_pressed: bool = false
 
 @onready var horizontal_movement_handler = $HorizontalMovementHandler
 @onready var movement_input_handler = $MovementInputHandler
+@onready var alignment_ray_manager = %AlignmentRayManager  # NEW
 
 
 
@@ -72,6 +75,12 @@ func _setup_movement_input():
 	# Connect to movement input handler signals
 	movement_input_handler.movement_input.connect(_on_movement_input)
 	movement_input_handler.jump_requested.connect(_on_jump_requested)
+
+func _setup_alignment_rays():
+	# Connect to alignment ray manager if using new system
+	if use_alignment_rays and alignment_ray_manager:
+		alignment_ray_manager.alignment_normal_calculated.connect(_on_alignment_normal_calculated)
+		print("Alignment ray system initialized")
 	
 func _ready():
 	
@@ -80,6 +89,7 @@ func _ready():
 	# setup dependencies (connect signals, initialize stuff etc.) 
 	_setup_ground_detection()
 	_setup_movement_input()
+	_setup_alignment_rays()  # NEW
 	
 		
 func _on_movement_input(movement_vector: Vector3,turn_amount: float, pitch: float):
@@ -116,9 +126,13 @@ func _process(delta):
 	# Update gravity handler state
 	gravity_handler.set_active(not is_grounded)
 	
-	# Only do terrain alignment if grounded
-	if is_grounded == true:
-		_align_to_terrain(delta)
+	# Choose alignment method based on settings
+	if use_alignment_rays and alignment_ray_manager:
+		_align_with_rays(delta)
+	else:
+		# Use original alignment method
+		if is_grounded == true:
+			_align_to_terrain(delta)
 	
 	# Apply visual pitch as the final step - but only if grounded
 	# When falling, the gravity alignment takes precedence
@@ -149,6 +163,60 @@ func _apply_visual_pitch():
 	var pitch_quaternion = Quaternion(terrain_basis.x.normalized(), current_pitch)
 	transform.basis = Basis(pitch_quaternion) * terrain_basis
 
+# NEW: Ray-based alignment system
+func _align_with_rays(delta):
+	# Get alignment normal from ray manager
+	var alignment_normal = alignment_ray_manager.get_alignment_normal(is_grounded)
+	
+	if is_grounded:
+		# When grounded, blend between leg-based and ray-based alignment
+		_align_to_terrain_with_rays(delta, alignment_normal)
+	else:
+		# When airborne, use only ray-based alignment
+		_align_airborne(delta, alignment_normal)
+
+func _align_to_terrain_with_rays(delta, ray_normal: Vector3):
+	# Get leg-based alignment (original method)
+	var plane1 = Plane(bl_leg.global_position, fl_leg.global_position, fr_leg.global_position)
+	var plane2 = Plane(fr_leg.global_position, br_leg.global_position, bl_leg.global_position)
+	var leg_normal = ((plane1.normal + plane2.normal) / 2).normalized()
+	
+	# Blend between leg normal and ray normal based on alignment_ray_manager settings
+	var final_normal = leg_normal
+	if alignment_ray_manager.is_any_alignment_ray_hitting():
+		var weight = alignment_ray_manager.grounded_weight
+		final_normal = leg_normal.lerp(ray_normal, weight).normalized()
+	
+	# Calculate target basis using blended normal
+	var target_basis = _basis_from_normal_for_terrain(final_normal, terrain_basis)
+	terrain_basis = lerp(terrain_basis, target_basis, (move_speed * 5) * delta).orthonormalized()
+	
+	# Apply the terrain basis (without pitch)
+	transform.basis = terrain_basis
+	
+	# Position adjustment with pitch compensation
+	var avg = (fl_leg.position + fr_leg.position + bl_leg.position + br_leg.position) / 4
+	var base_offset = ground_offset
+	
+	# Calculate additional height needed based on pitch
+	var pitch_height_offset = abs(sin(current_pitch)) * body_length * pitch_compensation_factor
+	
+	var total_offset = base_offset + pitch_height_offset
+	var target_pos = avg + transform.basis.y * total_offset
+	var distance = transform.basis.y.dot(target_pos - position)
+	position = lerp(position, position + transform.basis.y * distance, move_speed * delta)
+
+func _align_airborne(delta, alignment_normal: Vector3):
+	# When airborne, align to ray hits if available
+	if alignment_ray_manager.get_hitting_ray_count() > 0:
+		var target_basis = _basis_from_normal_for_terrain(alignment_normal, terrain_basis)
+		terrain_basis = lerp(terrain_basis, target_basis, airborne_alignment_speed * delta).orthonormalized()
+		transform.basis = terrain_basis
+	else:
+		# Fall back to gravity alignment if no rays hit
+		_align_to_gravity(delta)
+
+# Original alignment method (kept for compatibility)
 func _align_to_terrain(delta):
 	# Use global positions for plane calculations
 	var plane1 = Plane(bl_leg.global_position, fl_leg.global_position, fr_leg.global_position)
@@ -195,9 +263,14 @@ func _apply_gravity(delta):
 	var physics_displacement = gravity_handler.apply_physics(delta, transform)
 	global_position += physics_displacement
 	
-	# Align spider to fall "feet down" if needed
-	if gravity_handler.should_align_to_gravity():
-		_align_to_gravity(delta)
+	# Align spider based on whether we're using ray alignment
+	if use_alignment_rays and alignment_ray_manager:
+		# Ray alignment handles airborne alignment
+		pass  # Alignment handled in _align_with_rays
+	else:
+		# Original gravity alignment
+		if gravity_handler.should_align_to_gravity():
+			_align_to_gravity(delta)
 		
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
@@ -275,6 +348,10 @@ func _on_grounded_state_changed(grounded: bool):
 	if horizontal_movement_handler:
 		horizontal_movement_handler.set_grounded(grounded)
 		
+# NEW: Handle alignment normal updates
+func _on_alignment_normal_calculated(normal: Vector3, confidence: float):
+	# Could use confidence for additional logic if needed
+	pass
 		
 # Getter for current pitch - used by StepTargetContainer
 func _get_current_pitch() -> float:

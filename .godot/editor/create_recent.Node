@@ -1,3 +1,4 @@
+Node
 AnimationTree
 AnimationPlayer
 CollisionShape3D
@@ -7,7 +8,6 @@ RayCast3D
 StaticBody3D
 Camera3D
 NavigationAgent3D
-Node
 NavigationLink3D
 NavigationRegion3D
 CSGBox3D

@@ -1,20 +1,6 @@
 extends Node3D
-@export var is_grouned = false
-@export var strafe_speed: float = .5
-@export var move_speed: float = 1.0
-@export var turn_speed: float = 3.0
-@export var ground_offset: float = 0.15
-@export var gravity_strength: float = 9.8
-@export var terminal_velocity: float = 100.0
-@export var mouse_sensitivity: float = 0.005
-@export var capture_mouse: bool = true
-@export var max_turn_speed: float = 2.0
-@export var pitch_min: float = -85.0
-@export var pitch_max: float = 85.0
-@export var pitch_sensitivity: float = 0.005
-# New exports for pitch compensation
-@export var pitch_compensation_factor: float = 0.5  # How much to lift/lower based on pitch
-@export var body_length: float = .3  # Approximate length of spider body
+# Add AnimationPlayer reference with other @onready vars
+@onready var state_machine = $AnimationTree["parameters/playback"]
 
 @onready var fl_leg = $FrontLeftIKTarget
 @onready var fr_leg = $FrontRightIKTarget
@@ -26,14 +12,41 @@ extends Node3D
 @onready var bl_ray = $StepTargetContainer/BackLeftRay
 @onready var br_ray = $StepTargetContainer/BackRightRay
 
-# Jump variables
+# Movement Settings
+@export_group("Movement")
+@export var strafe_speed: float = .5
+@export var move_speed: float = 1.0
+@export var turn_speed: float = 3.0
+@export var max_turn_speed: float = 2.0
+
+# Ground Alignment Settings
+@export_group("Ground Alignment")
+@export var ground_offset: float = 0.15
+@export var body_length: float = .3
+@export var pitch_compensation_factor: float = 0.5
+@export var fall_alignment_speed: float = 5.0
+
+# Physics Settings
+@export_group("Physics")
+@export var gravity_strength: float = 9.8
+@export var terminal_velocity: float = 100.0
 @export var jump_strength: float = 1.0
+
+# Movement input values from handler
+var input_move_dir: float = 0.0
+var input_strafe_dir: float = 0.0
+var input_turn_amount: float = 0.0
+
+
+# Jump variables
+
 var jump_pressed: bool = false
 var can_jump: bool = true
 @export var is_jumping: bool = false
 
-# Add AnimationPlayer reference with other @onready vars
-@onready var state_machine = $AnimationTree["parameters/playback"]
+
+
+@onready var movement_input_handler = $MovementInputHandler
 
 
 var collision_states = {
@@ -49,7 +62,7 @@ signal grounded_state_changed(is_grounded: bool)
 var ground_ray_colliding: bool = false
 var vertical_velocity: float = 0.0
 var is_grounded: bool = true
-@export var fall_alignment_speed: float = 5.0
+
 
 var mouse_delta_x: float = 0.0
 var mouse_delta_y: float = 0.0
@@ -57,6 +70,7 @@ var current_pitch: float = 0.0
 
 # Store the terrain-aligned basis separately
 var terrain_basis: Basis
+
 
 func _ready():
 	Engine.time_scale = 1.0
@@ -71,29 +85,30 @@ func _ready():
 		bl_ray.collision_changed.connect(_on_collision_changed)
 	if br_ray:
 		br_ray.collision_changed.connect(_on_collision_changed)
-	
-	if capture_mouse:
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 	grounded_state_changed.connect(_on_grounded_state_changed)
 	
-func _input(event):
-		# Add this to the existing _input function
-	if event.is_action_pressed("jump") and can_jump and is_grounded:
-		state_machine.travel("fall")
-	
-		
-	if event is InputEventMouseMotion:
-		mouse_delta_x = event.relative.x
-		mouse_delta_y = event.relative.y
-	
-	if event.is_action_pressed("ui_cancel"):
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	# Connect to movement input handler signals
 
+	movement_input_handler.movement_input.connect(_on_movement_input)
+	movement_input_handler.jump_requested.connect(_on_jump_requested)
+		
+func _on_movement_input(movement_vector: Vector3,turn_amount: float, pitch: float):
+	current_pitch = pitch
+	input_move_dir = movement_vector.z
+	input_strafe_dir = movement_vector.x
+	input_turn_amount = turn_amount
+
+func _on_jump_requested():
+	if can_jump and is_grounded:
+		state_machine.travel("fall")
+		
+		
 func _process(delta):
+	# Update pitch from input handler
+	if movement_input_handler:
+		current_pitch = movement_input_handler.get_current_pitch()
+	
 	# Reset to terrain basis before any calculations
 	transform.basis = terrain_basis
 	
@@ -119,31 +134,19 @@ func _process(delta):
 		_apply_visual_pitch()
 
 func _handle_movement(delta):
-	# Forward/backward movement
-	var dir = Input.get_axis('ui_down', 'ui_up')
-	translate(Vector3(0, 0, -dir) * move_speed * delta)
+	# Apply movement
+	translate(Vector3(0, 0, -input_move_dir) * move_speed * delta)
+	translate(Vector3(input_strafe_dir, 0, 0) * strafe_speed * delta)
 	
-	var strafe = Input.get_axis('ui_left', 'ui_right')
-	translate(Vector3(strafe, 0, 0) * strafe_speed * delta)
-	
-	
-	# Horizontal turning
-	var turn_amount = -mouse_delta_x * mouse_sensitivity
-	turn_amount = clamp(turn_amount, -max_turn_speed * delta, max_turn_speed * delta)
+	# Apply rotation
+	var turn_amount = clamp(input_turn_amount, -max_turn_speed * delta, max_turn_speed * delta)
 	rotate_object_local(Vector3.UP, turn_amount)
 	
 	# Update terrain basis to include the rotation (only if grounded)
 	if is_grounded:
 		terrain_basis = transform.basis
-	
-	# Update pitch angle
-	var pitch_amount = -mouse_delta_y * pitch_sensitivity
-	current_pitch += pitch_amount
-	current_pitch = clamp(current_pitch, deg_to_rad(pitch_min), deg_to_rad(pitch_max))
-	
-	# Reset mouse deltas
-	mouse_delta_x = 0.0
-	mouse_delta_y = 0.0
+		
+		
 
 func _apply_visual_pitch():
 	# Use quaternion rotation to avoid gimbal lock
@@ -215,7 +218,6 @@ func _update_grounded_state():
 	if previous_grounded != is_grounded:
 		grounded_state_changed.emit(is_grounded)
 
-
 func _apply_gravity(delta):
 	# Increase downward velocity
 	vertical_velocity += gravity_strength * delta
@@ -227,7 +229,6 @@ func _apply_gravity(delta):
 	
 	# Align spider to fall "feet down"
 	_align_to_gravity(delta)
-	
 	
 func _align_to_gravity(delta):
 	# Get current forward direction (negative Z in local space)
@@ -276,7 +277,6 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
-
 	# Notify all IK targets about grounding state
 	if fl_leg:
 		fl_leg.set_grounded(grounded)
@@ -296,9 +296,7 @@ func _on_grounded_state_changed(grounded: bool):
 		bl_ray.set_grounded(grounded)
 	if br_ray and br_ray.has_method("set_grounded"):
 		br_ray.set_grounded(grounded)
-	
 
-	
 # Getter for current pitch - used by StepTargetContainer
 func _get_current_pitch() -> float:
 	return current_pitch
@@ -307,17 +305,13 @@ func _get_current_pitch() -> float:
 func _get_terrain_basis() -> Basis:
 	return terrain_basis
 
-
-
 func _jump():
 	if is_jumping == true and can_jump == true:
 		# Apply upward velocity - needs to be much stronger than gravity!
 		vertical_velocity = -jump_strength  # Try jump_strength = 10.0 or higher
 		
-
 		can_jump = false
 		
 		# FORCE the spider to be ungrounded immediately
 		is_grounded = false
 		grounded_state_changed.emit(false)
-		

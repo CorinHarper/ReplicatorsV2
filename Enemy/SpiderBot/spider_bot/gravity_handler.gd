@@ -51,5 +51,6 @@ func should_align_to_gravity() -> bool:
 	
 	# Check if we're falling by seeing if velocity has a significant downward component
 	# and we're past the peak of the jump
+	
 	var downward_velocity = velocity.dot(Vector3.DOWN)
 	return downward_velocity > 0.1  # Moving in the same direction as gravity

@@ -1,6 +1,7 @@
 extends Node3D
 # Add AnimationPlayer reference with other @onready vars
 @onready var state_machine = $AnimationTree["parameters/playback"]
+@export var is_falling_state:bool = false
 
 @onready var fl_leg = $FrontLeftIKTarget
 @onready var fr_leg = $FrontRightIKTarget
@@ -38,8 +39,8 @@ var input_turn_amount: float = 0.0
 # Jump variables
 
 var jump_pressed: bool = false
-@export var can_jump: bool = true
-@export var is_jumping: bool = false
+@export var can_jump: bool = true		# only exported for animation PLAYER access
+@export var is_jumping: bool = false	# only exported for animation PLAYER access
 
 
 
@@ -50,7 +51,7 @@ var jump_pressed: bool = false
 # Ground detection ray
 @onready var ground_ray: RayCast3D = $StepTargetContainer/GroundRay
 var vertical_velocity: float = 0.0
-var is_grounded: bool = true
+@export var is_grounded: bool = true		# only exported for animation tree access 
 
 
 var mouse_delta_x: float = 0.0
@@ -87,7 +88,7 @@ func _on_movement_input(movement_vector: Vector3,turn_amount: float, pitch: floa
 
 func _on_jump_requested():
 	if can_jump and is_grounded:
-		state_machine.travel("fall")
+		state_machine.travel("crouch")
 		
 		
 func _process(delta):
@@ -132,7 +133,7 @@ func _handle_movement(delta):
 	rotate_object_local(Vector3.UP, turn_amount)
 	
 	# Update terrain basis to include the rotation (only if grounded)
-	if is_grounded:
+	if is_grounded and is_jumping :
 		terrain_basis = transform.basis
 		
 		
@@ -239,10 +240,11 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
+
 	# When regaining ground from airborne, update terrain basis
 	if grounded and not is_grounded:
 		terrain_basis = transform.basis
-	
+		is_falling_state = false
 	is_grounded = grounded  # Update local state
 	
 	# Notify all IK targets about grounding state

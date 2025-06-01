@@ -1,9 +1,8 @@
-[gd_scene load_steps=34 format=3 uid="uid://cabgrr2bvykhs"]
+[gd_scene load_steps=35 format=3 uid="uid://cabgrr2bvykhs"]
 
 [ext_resource type="Script" uid="uid://dkj7dvt1q82co" path="res://Enemy/SpiderBot/spider_bot/start_ik.gd" id="1_n6l5c"]
 [ext_resource type="PackedScene" uid="uid://b1n5rqw53onuo" path="res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf" id="1_vovvw"]
 [ext_resource type="Script" uid="uid://ce1adc065qpu2" path="res://Enemy/SpiderBot/spider_bot/spider_bot.gd" id="2_kfpvc"]
-[ext_resource type="Curve" uid="uid://cs31qfqxy11yl" path="res://Curves/basic_power_curve.tres" id="3_k1hnp"]
 [ext_resource type="Script" uid="uid://ttw5il2nhsd0" path="res://Enemy/SpiderBot/spider_bot/step_ray.gd" id="4_8a6ki"]
 [ext_resource type="Script" uid="uid://cjolrusr43m3e" path="res://Enemy/SpiderBot/spider_bot/ik_target.gd" id="4_p25cf"]
 [ext_resource type="Script" uid="uid://cqtd5onb2uk84" path="res://Enemy/SpiderBot/spider_bot/gravity_handler.gd" id="4_y430h"]
@@ -56,14 +55,38 @@ tracks/3/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:is_falling_state")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
-[sub_resource type="Animation" id="Animation_gltnb"]
-resource_name = "fall"
+[sub_resource type="Animation" id="Animation_per0y"]
+resource_name = "crouch"
+length = 0.1
 tracks/0/type = "position_3d"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("Armature")
-tracks/0/interp = 1
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, -0.1, 0)
+
+[sub_resource type="Animation" id="Animation_gltnb"]
+resource_name = "fall"
+length = 0.3
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, -0.155, 0)
 
@@ -164,16 +187,29 @@ tracks/2/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:is_falling_state")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.0333333),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_pik5h"]
 resource_name = "land"
+length = 0.35
 tracks/0/type = "position_3d"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("Armature")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
-tracks/0/keys = PackedFloat32Array(0.0333333, 1, 0, -0.07, 0, 1, 1, 0, -0.02, 0)
+tracks/0/keys = PackedFloat32Array(0.0333333, 1, 0, 0.3, 0, 0.35, 1, 0, -0.1, 0)
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
@@ -202,6 +238,7 @@ tracks/2/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_815yx"]
 _data = {
 &"RESET": SubResource("Animation_gmc3e"),
+&"crouch": SubResource("Animation_per0y"),
 &"fall": SubResource("Animation_gltnb"),
 &"idle": SubResource("Animation_815yx"),
 &"jump": SubResource("Animation_k1hnp"),
@@ -209,63 +246,66 @@ _data = {
 &"land": SubResource("Animation_pik5h")
 }
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_per0y"]
-animation = &"fall"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gmc3e"]
-animation = &"idle"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_k1hnp"]
-animation = &"jump_simple"
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gltnb"]
+animation = &"crouch"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_6jwsp"]
-animation = &"land"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_815yx"]
 animation = &"fall"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_815yx"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_y430h"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pik5h"]
+animation = &"jump_simple"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_per0y"]
+animation = &"land"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6jwsp"]
 advance_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_y430h"]
-xfade_time = 1.0
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5uion"]
+xfade_time = 0.15
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_q8cd8"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_pa55s"]
+xfade_time = 0.15
 switch_mode = 2
 advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_fpylf"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5uion"]
-xfade_time = 0.2
-switch_mode = 1
 advance_mode = 2
+advance_condition = &"is_falling_state"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_q8cd8"]
-xfade_time = 1.0
-xfade_curve = ExtResource("3_k1hnp")
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_irdsp"]
+xfade_time = 0.15
 switch_mode = 2
 advance_mode = 2
+advance_expression = "is_grounded == true"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_pa55s"]
-xfade_time = 1.0
-xfade_curve = ExtResource("3_k1hnp")
-switch_mode = 2
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_cilhs"]
+xfade_time = 0.3
 advance_mode = 2
+advance_expression = "is_falling_state == true"
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_pik5h"]
 states/Start/position = Vector2(212.5, 105.5)
-states/fall/node = SubResource("AnimationNodeAnimation_per0y")
-states/fall/position = Vector2(742.484, 162.713)
-states/idle/node = SubResource("AnimationNodeAnimation_gmc3e")
-states/idle/position = Vector2(495.125, 149)
-states/jump/node = SubResource("AnimationNodeAnimation_k1hnp")
-states/jump/position = Vector2(742.438, 284)
-states/land/node = SubResource("AnimationNodeAnimation_6jwsp")
-states/land/position = Vector2(349.5, 242.713)
-states/mid_air/node = SubResource("AnimationNodeAnimation_815yx")
-states/mid_air/position = Vector2(496.594, 307.213)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_815yx"), "jump", "mid_air", SubResource("AnimationNodeStateMachineTransition_y430h"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "jump", SubResource("AnimationNodeStateMachineTransition_5uion"), "mid_air", "land", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_pa55s")]
-graph_offset = Vector2(0, 115.713)
+states/crouch/node = SubResource("AnimationNodeAnimation_gltnb")
+states/crouch/position = Vector2(736.5, 193.213)
+states/fall/node = SubResource("AnimationNodeAnimation_6jwsp")
+states/fall/position = Vector2(494.5, 594.213)
+states/idle/node = SubResource("AnimationNodeAnimation_y430h")
+states/idle/position = Vector2(540.5, 218.713)
+states/jump/node = SubResource("AnimationNodeAnimation_pik5h")
+states/jump/position = Vector2(943.5, 305.713)
+states/land/node = SubResource("AnimationNodeAnimation_per0y")
+states/land/position = Vector2(679.875, 343.213)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_6jwsp"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_5uion"), "idle", "crouch", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "crouch", "jump", SubResource("AnimationNodeStateMachineTransition_pa55s"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_irdsp"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_cilhs")]
+graph_offset = Vector2(0, 277.14)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gmc3e"]
 size = Vector3(0.3, 0.162793, 0.3)
@@ -288,7 +328,7 @@ script = ExtResource("2_kfpvc")
 move_speed = 2.0
 ground_offset = 0.1
 body_length = 0.5
-jump_strength = 3.0
+jump_strength = 5.0
 
 [node name="MovementInputHandler" type="Node" parent="." index="0"]
 script = ExtResource("8_815yx")
@@ -304,9 +344,12 @@ playback_auto_capture = false
 playback_default_blend_time = 1.0
 
 [node name="AnimationTree" type="AnimationTree" parent="." index="3"]
+unique_name_in_owner = true
+root_node = NodePath("%AnimationTree/..")
 tree_root = SubResource("AnimationNodeStateMachine_pik5h")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
+parameters/conditions/is_falling_state = false
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." index="4"]
 
@@ -315,7 +358,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0688457, 0)
 shape = SubResource("BoxShape3D_gmc3e")
 
 [node name="Armature" parent="." index="5"]
-transform = Transform3D(0.3, 0, 0, 0, 0.299999, 0, 0, 0, 0.299999, 0, 0, 0)
+transform = Transform3D(0.3, 0, 0, 0, 0.299995, 0.00152432, 0, -0.00152432, 0.299995, 0, 0, 0)
 
 [node name="Body_2" parent="Armature/Skeleton3D" index="0"]
 transform = Transform3D(0.325856, 0, 0, 0, 0.325856, 0, 0, 0, 0.325856, 0, 0, 0)
@@ -434,7 +477,7 @@ script = ExtResource("4_p25cf")
 step_target = NodePath("../StepTargetContainer/FrontLeftRay/FrontLeftStepTarget")
 adjacent_target = NodePath("../FrontRightIKTarget")
 opposite_target = NodePath("../BackRightIKTarget")
-retract_speed = 0.12
+retract_speed = 0.25
 
 [node name="FrontRightIKTarget" type="Marker3D" parent="." index="8" node_paths=PackedStringArray("step_target", "adjacent_target", "opposite_target")]
 unique_name_in_owner = true

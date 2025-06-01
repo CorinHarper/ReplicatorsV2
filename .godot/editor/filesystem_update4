@@ -9,3 +9,4 @@ res://Enemy/SpiderBot/spider_bot/spider_bot.tscn
 res://TestLevel.tscn
 res://Enemy/SpiderBot/spider_bot/spider_bot.gd
 res://Enemy/SpiderBot/spider_bot/movement_handler.gd
+res://Enemy/SpiderBot/spider_bot/ground_detection.gd

@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://cabgrr2bvykhs"]
+[gd_scene load_steps=33 format=3 uid="uid://cabgrr2bvykhs"]
 
 [ext_resource type="Script" uid="uid://dkj7dvt1q82co" path="res://Enemy/SpiderBot/spider_bot/start_ik.gd" id="1_n6l5c"]
 [ext_resource type="PackedScene" uid="uid://b1n5rqw53onuo" path="res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf" id="1_vovvw"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://ttw5il2nhsd0" path="res://Enemy/SpiderBot/spider_bot/step_ray.gd" id="4_8a6ki"]
 [ext_resource type="Script" uid="uid://cjolrusr43m3e" path="res://Enemy/SpiderBot/spider_bot/ik_target.gd" id="4_p25cf"]
 [ext_resource type="Script" uid="uid://bjm4aeaua26ug" path="res://Enemy/SpiderBot/spider_bot/StepTargetContainer.gd" id="5_yguvh"]
+[ext_resource type="Script" uid="uid://cca8vsepre1b6" path="res://Enemy/SpiderBot/spider_bot/ground_detection.gd" id="7_gltnb"]
 [ext_resource type="Script" uid="uid://oof52yb5ur7c" path="res://Enemy/SpiderBot/spider_bot/movement_handler.gd" id="8_815yx"]
 
 [sub_resource type="Animation" id="Animation_gmc3e"]
@@ -41,6 +42,18 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:can_jump")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_gltnb"]
@@ -101,6 +114,18 @@ tracks/2/keys = {
 "update": 0,
 "values": [2.0, 0.0]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:can_jump")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_y430h"]
 resource_name = "jump_simple"
@@ -159,6 +184,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:can_jump")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.0333333),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_815yx"]
@@ -342,7 +379,11 @@ script = ExtResource("1_n6l5c")
 script = ExtResource("5_yguvh")
 offset = 3.0
 
-[node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="0" node_paths=PackedStringArray("step_target")]
+[node name="GroundRay" type="RayCast3D" parent="StepTargetContainer" index="0"]
+target_position = Vector3(0, -0.2, 0)
+script = ExtResource("7_gltnb")
+
+[node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, -0.25, 0.5, -0.25)
 target_position = Vector3(0, -1.5, 0)
@@ -352,7 +393,7 @@ step_target = NodePath("FrontLeftStepTarget")
 [node name="FrontLeftStepTarget" type="Marker3D" parent="StepTargetContainer/FrontLeftRay" index="0"]
 transform = Transform3D(0.999903, 1.4028e-08, -0.0139622, -1.31666e-07, 1, -5.21541e-08, 0.0139622, 0, 0.999903, 0, -0.634657, 0)
 
-[node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="1" node_paths=PackedStringArray("step_target")]
+[node name="FrontRightRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.991445, -0.130526, 0, 0.130526, 0.991445, 0.25, 0.5, -0.25)
 target_position = Vector3(0, -1.5, 0)
@@ -362,7 +403,7 @@ step_target = NodePath("FrontRightStepTarget")
 [node name="FrontRightStepTarget" type="Marker3D" parent="StepTargetContainer/FrontRightRay" index="0"]
 transform = Transform3D(0.985133, 0.171244, 0.0137501, -0.17101, 0.969846, 0.173648, 0.0164007, -0.173418, 0.984713, 0, -0.634657, 0)
 
-[node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="2" node_paths=PackedStringArray("step_target")]
+[node name="BackLeftRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, -0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
@@ -372,7 +413,7 @@ step_target = NodePath("BackLeftStepTarget")
 [node name="BackLeftStepTarget" type="Marker3D" parent="StepTargetContainer/BackLeftRay" index="0"]
 transform = Transform3D(0.985133, -0.171244, 0.0137501, 0.17101, 0.969848, -0.173648, 0.0164007, 0.173418, 0.984713, 0, -0.634656, 0)
 
-[node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="3" node_paths=PackedStringArray("step_target")]
+[node name="BackRightRay" type="RayCast3D" parent="StepTargetContainer" index="4" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.99981, -0.019494, 0, 0.019494, 0.99981, 0.25, 0.5, 0.180923)
 target_position = Vector3(0, -1.5, 0)
@@ -421,8 +462,5 @@ step_target = NodePath("../StepTargetContainer/BackRightRay/BackRightStepTarget"
 adjacent_target = NodePath("../BackLeftIKTarget")
 opposite_target = NodePath("../FrontLeftIKTarget")
 retract_speed = 0.11
-
-[node name="GroundRay" type="RayCast3D" parent="." index="10"]
-target_position = Vector3(0, -0.2, 0)
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

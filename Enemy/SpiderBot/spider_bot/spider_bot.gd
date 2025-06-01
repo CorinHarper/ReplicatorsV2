@@ -41,7 +41,7 @@ var input_turn_amount: float = 0.0
 # Jump variables
 
 var jump_pressed: bool = false
-var can_jump: bool = true
+@export var can_jump: bool = true
 @export var is_jumping: bool = false
 
 
@@ -49,17 +49,9 @@ var can_jump: bool = true
 @onready var movement_input_handler = $MovementInputHandler
 
 
-var collision_states = {
-	"FrontLeftRay": false,
-	"FrontRightRay": false,
-	"BackLeftRay": false,
-	"BackRightRay": false
-}
 
 # Ground detection ray
-signal grounded_state_changed(is_grounded: bool)
-@onready var ground_ray = $GroundRay
-var ground_ray_colliding: bool = false
+@onready var ground_ray: RayCast3D = $StepTargetContainer/GroundRay
 var vertical_velocity: float = 0.0
 var is_grounded: bool = true
 
@@ -76,18 +68,11 @@ func _ready():
 	Engine.time_scale = 1.0
 	# Initialize terrain basis
 	terrain_basis = transform.basis
-	
-	if fl_ray:
-		fl_ray.collision_changed.connect(_on_collision_changed)
-	if fr_ray:
-		fr_ray.collision_changed.connect(_on_collision_changed)
-	if bl_ray:
-		bl_ray.collision_changed.connect(_on_collision_changed)
-	if br_ray:
-		br_ray.collision_changed.connect(_on_collision_changed)
 
-	grounded_state_changed.connect(_on_grounded_state_changed)
-	
+		# Set up ground detection through the ground ray
+	if ground_ray and ground_ray.has_method("setup_leg_rays"):
+		ground_ray.setup_leg_rays($StepTargetContainer)
+		ground_ray.grounded_state_changed.connect(_on_grounded_state_changed)
 	# Connect to movement input handler signals
 
 	movement_input_handler.movement_input.connect(_on_movement_input)
@@ -115,8 +100,9 @@ func _process(delta):
 	# Handle user input
 	_handle_movement(delta)
 	
-	# Check if any leg is touching ground
-	_update_grounded_state()
+	# Keep local grounded state synced with ground ray
+	if ground_ray and ground_ray.has_method("get_grounded_state"):
+		is_grounded = ground_ray.get_grounded_state()
 	
 	# Apply gravity if not grounded
 	if not is_grounded:
@@ -194,29 +180,6 @@ func _basis_from_normal_for_terrain(normal: Vector3, current_terrain_basis: Basi
 	
 	return result
 	
-func _update_grounded_state():
-	var previous_grounded = is_grounded
-
-	if is_grounded:
-		# When grounded, lose ground contact if NO legs are touching
-		is_grounded = collision_states.values().any(func(colliding): return colliding)
-		can_jump = true
-		is_jumping = false
-	else:
-		# When airborne, only regain ground contact via ground ray
-		if ground_ray and ground_ray.is_colliding():
-			is_grounded = true
-			can_jump = true
-			is_jumping = false
-			# When regaining ground, update terrain basis to current orientation
-			terrain_basis = transform.basis
-		else:
-			is_jumping = true
-			can_jump = false
-			
-	# Emit signal if state changed
-	if previous_grounded != is_grounded:
-		grounded_state_changed.emit(is_grounded)
 
 func _apply_gravity(delta):
 	# Increase downward velocity
@@ -260,8 +223,7 @@ func _align_to_gravity(delta):
 	terrain_basis = lerp(terrain_basis, target_basis, fall_alignment_speed * delta).orthonormalized()
 	transform.basis = terrain_basis
 
-func _on_collision_changed(leg_name: String, is_colliding: bool):
-	collision_states[leg_name] = is_colliding
+
 
 func _basis_from_normal(normal: Vector3) -> Basis:
 	var result = Basis()
@@ -277,6 +239,12 @@ func _basis_from_normal(normal: Vector3) -> Basis:
 	return result
 
 func _on_grounded_state_changed(grounded: bool):
+	# When regaining ground from airborne, update terrain basis
+	if grounded and not is_grounded:
+		terrain_basis = transform.basis
+	
+	is_grounded = grounded  # Update local state
+	
 	# Notify all IK targets about grounding state
 	if fl_leg:
 		fl_leg.set_grounded(grounded)
@@ -304,14 +272,12 @@ func _get_current_pitch() -> float:
 # Getter for terrain basis - used by StepTargetContainer
 func _get_terrain_basis() -> Basis:
 	return terrain_basis
-
+	
 func _jump():
 	if is_jumping == true and can_jump == true:
-		# Apply upward velocity - needs to be much stronger than gravity!
-		vertical_velocity = -jump_strength  # Try jump_strength = 10.0 or higher
-		
+		vertical_velocity = -jump_strength
 		can_jump = false
 		
-		# FORCE the spider to be ungrounded immediately
-		is_grounded = false
-		grounded_state_changed.emit(false)
+		# Force ungrounded through the ground ray
+		if ground_ray and ground_ray.has_method("force_ungrounded"):
+			ground_ray.force_ungrounded()

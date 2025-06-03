@@ -36,7 +36,7 @@ func _ready():
 	_create_alignment_rays()
 	
 	# Get reference to existing ground ray
-	ground_ray = get_node_or_null("../GroundRay")
+	ground_ray = get_node_or_null("GroundRay")
 	
 	if debug_draw:
 		set_physics_process(true)

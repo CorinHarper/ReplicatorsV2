@@ -10,6 +10,8 @@ extends Marker3D
 
 var is_stepping := false
 var is_grounded: bool = true
+var is_sprinting: bool = false
+
 var default_local_position: Vector3  # Store the initial local position relative to owner
 @export var retract_speed: float = .05
 
@@ -22,10 +24,19 @@ func _ready():
 
 func _process(delta):
 	if is_grounded:
+		if is_sprinting: 
+			step_speed = 0.07
+			step_distance = .5
+			if !is_stepping && !opposite_target.is_stepping && abs(global_position.distance_to(step_target.global_position)) > step_distance:
+				sprint()
+				adjacent_target.sprint()
 		# Normal stepping behavior when grounded
-		if !is_stepping && !adjacent_target.is_stepping && abs(global_position.distance_to(step_target.global_position)) > step_distance:
+		elif !is_stepping && !adjacent_target.is_stepping && abs(global_position.distance_to(step_target.global_position)) > step_distance:
+			step_distance = .3
+			step_speed = 0.06
 			step()
 			opposite_target.step()
+		
 	else:
 		# When falling, move IK target to its default position underneath the spider
 		if owner:
@@ -48,6 +59,16 @@ func step():
 	t.tween_property(self, "global_position", target_pos, step_speed)
 	t.tween_callback(func(): is_stepping = false)
 	
+func sprint():
+	var target_pos = step_target.global_position
+	var half_way = (global_position + step_target.global_position) / 2
+	is_stepping = true
+	
+	var t = get_tree().create_tween()
+	t.tween_property(self, "global_position", half_way + owner.basis.y * 0.4, step_speed)
+	t.tween_property(self, "global_position", target_pos, step_speed)
+	t.tween_callback(func(): is_stepping = false)
+	
 func fall():
 	var target_pos = step_target.global_position
 	#var half_way = (global_position + step_target.global_position) / 2
@@ -67,3 +88,6 @@ func set_grounded(grounded: bool):
 		var tween = get_tree().create_tween()
 		if tween:
 			tween.kill()
+
+func set_sprinting(sprinting: bool):	
+	is_sprinting = sprinting

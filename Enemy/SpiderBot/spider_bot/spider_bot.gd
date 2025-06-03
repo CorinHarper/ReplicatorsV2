@@ -2,6 +2,7 @@ extends Node3D
 # Add AnimationPlayer reference with other @onready vars
 @onready var state_machine = $AnimationTree["parameters/playback"]
 @export var is_falling_state:bool = false
+@export var is_sprint_state:bool = false
 
 
 @onready var fl_leg = $FrontLeftIKTarget
@@ -17,7 +18,8 @@ extends Node3D
 # Movement Settings
 @export_group("Movement")
 @export var strafe_speed: float = .5
-@export var move_speed: float = 1.0
+@export var max_sprint_speed: float = 2.5
+@export var max_walk_speed: float = 1.0
 @export var turn_speed: float = 3.0
 @export var max_turn_speed: float = 2.0
 
@@ -37,7 +39,7 @@ extends Node3D
 var input_move_dir: float = 0.0
 var input_strafe_dir: float = 0.0
 var input_turn_amount: float = 0.0
-
+var move_speed: float = 1.0
 
 # Jump variables
 
@@ -75,6 +77,7 @@ func _setup_movement_input():
 	# Connect to movement input handler signals
 	movement_input_handler.movement_input.connect(_on_movement_input)
 	movement_input_handler.jump_requested.connect(_on_jump_requested)
+	movement_input_handler.sprint_requested.connect(_on_sprint_requested)
 
 func _setup_alignment_rays():
 	# Connect to alignment ray manager if using new system
@@ -102,7 +105,30 @@ func _on_jump_requested():
 	if can_jump and is_grounded:
 		state_machine.travel("crouch")
 		
+func _on_sprint_requested(is_sprinting:bool):
+	
+	if is_sprinting: 
+		horizontal_movement_handler.max_move_speed = max_sprint_speed
+		state_machine.travel("sprint")
+		%StepTargetContainer.offset = 20
+	else:
+		horizontal_movement_handler.max_move_speed = max_walk_speed
+		%StepTargetContainer.offset = 10
+	update_sprinting(is_sprinting)
+	is_sprint_state = is_sprinting
+	
+func update_sprinting(is_sprinting: bool):
+	# Notify all IK targets about sprinting state
+	if fl_leg:
+		fl_leg.set_sprinting(is_sprinting)
+	if fr_leg:
+		fr_leg.set_sprinting(is_sprinting)
+	if bl_leg:
+		bl_leg.set_sprinting(is_sprinting)
+	if br_leg:
+		br_leg.set_sprinting(is_sprinting)
 
+		
 func _process(delta):
 	# Update pitch from input handler
 	if movement_input_handler:
@@ -225,7 +251,7 @@ func _align_to_terrain(delta):
 	
 	# Calculate target basis using the current terrain basis
 	var target_basis = _basis_from_normal_for_terrain(avg_normal, terrain_basis)
-	terrain_basis = lerp(terrain_basis, target_basis, (move_speed * 5) * delta).orthonormalized()
+	terrain_basis = lerp(terrain_basis, target_basis, (move_speed) * delta).orthonormalized()
 	
 	# Apply the terrain basis (without pitch)
 	transform.basis = terrain_basis

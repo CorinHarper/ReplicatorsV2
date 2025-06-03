@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://cabgrr2bvykhs"]
+[gd_scene load_steps=44 format=3 uid="uid://cabgrr2bvykhs"]
 
 [ext_resource type="Script" uid="uid://dkj7dvt1q82co" path="res://Enemy/SpiderBot/spider_bot/start_ik.gd" id="1_n6l5c"]
 [ext_resource type="PackedScene" uid="uid://b1n5rqw53onuo" path="res://Enemy/SpiderBot/spider_bot/spider_bot_model.gltf" id="1_vovvw"]
@@ -91,7 +91,7 @@ tracks/0/enabled = true
 tracks/0/path = NodePath("Armature")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
-tracks/0/keys = PackedFloat32Array(0, 1, 0, -0.155, 0)
+tracks/0/keys = PackedFloat32Array(0, 1, 0, -0.1, 0)
 
 [sub_resource type="Animation" id="Animation_815yx"]
 resource_name = "idle"
@@ -238,6 +238,18 @@ tracks/2/keys = {
 "values": [true]
 }
 
+[sub_resource type="Animation" id="Animation_6jwsp"]
+resource_name = "sprint"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Armature")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0.0333333, 1, 0, 0.07, 0)
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_815yx"]
 _data = {
 &"RESET": SubResource("Animation_gmc3e"),
@@ -246,7 +258,8 @@ _data = {
 &"idle": SubResource("Animation_815yx"),
 &"jump": SubResource("Animation_k1hnp"),
 &"jump_simple": SubResource("Animation_y430h"),
-&"land": SubResource("Animation_pik5h")
+&"land": SubResource("Animation_pik5h"),
+&"sprint": SubResource("Animation_6jwsp")
 }
 
 [sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_y430h"]
@@ -265,6 +278,9 @@ animation = &"jump_simple"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_per0y"]
 animation = &"land"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fpylf"]
+animation = &"sprint"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6jwsp"]
 advance_mode = 2
@@ -300,6 +316,15 @@ advance_expression = "is_falling_state == true"
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_pik5h"]
 advance_mode = 2
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_amtsq"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8nht0"]
+xfade_time = 0.2
+switch_mode = 1
+advance_mode = 2
+advance_expression = "is_sprint_state == false"
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_pik5h"]
 states/BlendSpace2D/node = SubResource("AnimationNodeBlendSpace2D_y430h")
 states/BlendSpace2D/position = Vector2(230.5, 229.298)
@@ -314,10 +339,14 @@ states/jump/node = SubResource("AnimationNodeAnimation_pik5h")
 states/jump/position = Vector2(943.5, 305.713)
 states/land/node = SubResource("AnimationNodeAnimation_per0y")
 states/land/position = Vector2(679.875, 343.213)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_6jwsp"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_5uion"), "idle", "crouch", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "crouch", "jump", SubResource("AnimationNodeStateMachineTransition_pa55s"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_irdsp"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_cilhs"), "Start", "BlendSpace2D", SubResource("AnimationNodeStateMachineTransition_pik5h")]
+states/sprint/node = SubResource("AnimationNodeAnimation_fpylf")
+states/sprint/position = Vector2(372, 332.298)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_6jwsp"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_5uion"), "idle", "crouch", SubResource("AnimationNodeStateMachineTransition_q8cd8"), "crouch", "jump", SubResource("AnimationNodeStateMachineTransition_pa55s"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_fpylf"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_irdsp"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_cilhs"), "Start", "BlendSpace2D", SubResource("AnimationNodeStateMachineTransition_pik5h"), "idle", "sprint", SubResource("AnimationNodeStateMachineTransition_amtsq"), "sprint", "idle", SubResource("AnimationNodeStateMachineTransition_8nht0")]
 graph_offset = Vector2(0, 17.2985)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gmc3e"]
+custom_solver_bias = 1.0
+margin = 0.4
 size = Vector3(0.3, 0.162793, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwxtc"]
@@ -335,7 +364,7 @@ albedo_color = Color(0.52549, 0.52549, 0.52549, 1)
 [node name="SpiderBot" instance=ExtResource("1_vovvw")]
 transform = Transform3D(1, 0, 0, 0, 0.999917, -0.0128576, 0, 0.0128576, 0.999917, 0, 0.1555, 0)
 script = ExtResource("2_kfpvc")
-move_speed = 2.0
+is_sprint_state = true
 ground_offset = 0.12
 body_length = 0.5
 pitch_compensation_factor = 0.35
@@ -344,27 +373,25 @@ jump_strength = 5.0
 [node name="HorizontalMovementHandler" type="Node" parent="." index="0"]
 script = ExtResource("3_y430h")
 strafe_acceleration = 5.0
+friction = 3.0
 max_strafe_speed = 1.0
 
 [node name="MovementInputHandler" type="Node" parent="." index="1"]
 script = ExtResource("8_815yx")
 
-[node name="GravityHandler" type="Node" parent="." index="2"]
-script = ExtResource("4_y430h")
-
-[node name="SpiderDebugHelper" type="Node" parent="." index="3"]
+[node name="SpiderDebugHelper" type="Node" parent="." index="2"]
 script = ExtResource("12_per0y")
 
-[node name="AlignmentRayManager" type="Node3D" parent="." index="4"]
+[node name="AlignmentRayManager" type="Node3D" parent="." index="3"]
 unique_name_in_owner = true
 transform = Transform3D(0.3, 0, 0, 0, 0.299999, 0, 0, 0, 0.299999, 0, 0, 0)
 script = ExtResource("7_pik5h")
-ray_length = 1.5
+ray_length = 1.0
+debug_draw = true
 
 [node name="GroundRay" type="RayCast3D" parent="AlignmentRayManager" index="0"]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.999917, -0.0128576, 0, 0.0128576, 0.999917, 0, 0.4, -0.002)
-target_position = Vector3(0, -0.8, 0)
 script = ExtResource("7_gltnb")
 surface_angle_threshold = 90.0
 
@@ -387,6 +414,9 @@ target_position = Vector3(0, 1, 0)
 unique_name_in_owner = true
 transform = Transform3D(-4.37114e-08, -1, 0, 0.999917, -4.37078e-08, -0.0128576, 0.0128576, -5.62024e-10, 0.999917, 0, 0.1555, 0)
 target_position = Vector3(0, 1, 0)
+
+[node name="GravityHandler" type="Node" parent="." index="4"]
+script = ExtResource("4_y430h")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="5"]
 libraries = {
@@ -475,7 +505,9 @@ target_node = NodePath("../../../BackRightIKTarget")
 script = ExtResource("1_n6l5c")
 
 [node name="StepTargetContainer" type="Node3D" parent="." index="9"]
+unique_name_in_owner = true
 script = ExtResource("5_yguvh")
+offset = 10.0
 
 [node name="FrontLeftRay" type="RayCast3D" parent="StepTargetContainer" index="0" node_paths=PackedStringArray("step_target")]
 unique_name_in_owner = true

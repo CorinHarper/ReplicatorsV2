@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://i5i526f5yl6m"]
+[gd_scene load_steps=7 format=3 uid="uid://i5i526f5yl6m"]
 
 [ext_resource type="PackedScene" uid="uid://cabgrr2bvykhs" path="res://Enemy/SpiderBot/spider_bot/spider_bot.tscn" id="2_2xot7"]
+[ext_resource type="Script" uid="uid://binu3pw5ml1cd" path="res://camera_3d.gd" id="2_waekl"]
 [ext_resource type="PackedScene" uid="uid://wdt75bmcdfcp" path="res://DevMap.tscn" id="3_2xot7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vvvv7"]
@@ -29,9 +30,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
 environment = SubResource("Environment_y1jsw")
 
 [node name="SpiderBot" parent="." instance=ExtResource("2_2xot7")]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2782, 3.51154, 3.8752)
 
-[node name="Camera3D" type="Camera3D" parent="SpiderBot"]
-transform = Transform3D(1, 0, 0, 0, 0.94242, 0.334432, 0, -0.334432, 0.94242, -0.000361294, 0.466136, 1.23459)
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.949803, 0.312849, 0, -0.312849, 0.949803, 0.2782, 4.08492, 4.76319)
 current = true
 fov = 80.0
+script = ExtResource("2_waekl")

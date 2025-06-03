@@ -4,6 +4,7 @@ extends Node
 signal movement_input(direction: Vector3, turn: float, pitch: float)
 signal jump_requested()
 signal mouse_mode_toggle()
+signal sprint_requested(is_sprint_pressed: bool)
 
 # Camera/Input Settings
 @export_group("Camera Controls")
@@ -12,6 +13,7 @@ signal mouse_mode_toggle()
 @export var pitch_min: float = -85.0
 @export var pitch_max: float = 85.0
 @export var capture_mouse: bool = true
+
 
 var mouse_delta_x: float = 0.0
 var mouse_delta_y: float = 0.0
@@ -35,6 +37,11 @@ func _input(event):
 	
 	if event.is_action_pressed("jump"):
 		jump_requested.emit()
+	
+	if event.is_action_pressed("sprint"):
+		sprint_requested.emit(true)
+	elif event.is_action_released("sprint"):
+		sprint_requested.emit(false)
 
 func _process(_delta):
 	# Calculate movement direction
